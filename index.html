@@ -1,3 +1,6 @@
+
+
+Index · HTML
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -6,9 +9,9 @@
 <title>나의 빌베 DNA 찾기</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
-
+ 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+ 
   :root {
     --green: #1D9E75;
     --green-dark: #0F6E56;
@@ -23,7 +26,7 @@
     --radius: 14px;
     --radius-sm: 8px;
   }
-
+ 
   body {
     font-family: 'Noto Sans KR', sans-serif;
     background: var(--bg);
@@ -34,12 +37,12 @@
     justify-content: center;
     padding: 2rem 1rem 4rem;
   }
-
+ 
   .wrap {
     width: 100%;
     max-width: 480px;
   }
-
+ 
   /* ── top bar ── */
   .topbar {
     display: flex;
@@ -55,11 +58,11 @@
   }
   .logo-mark span { font-size: 14px; }
   .brand { font-size: 13px; font-weight: 700; color: var(--green-dark); letter-spacing: -0.2px; }
-
+ 
   /* ── screen toggle ── */
   .screen { display: none; }
   .screen.on { display: block; }
-
+ 
   /* ── intro ── */
   .intro-hero {
     background: var(--white);
@@ -123,7 +126,7 @@
   }
   .btn-start:hover { background: var(--green-dark); }
   .btn-start:active { transform: scale(0.98); }
-
+ 
   .name-card {
     background: var(--white);
     border: 1px solid var(--border);
@@ -152,7 +155,7 @@
   }
   .name-card input:focus { border-color: var(--green); background: #fff; }
   .name-card input::placeholder { color: var(--text-muted); }
-
+ 
   /* ── quiz ── */
   .progress-track {
     height: 4px;
@@ -232,7 +235,7 @@
   .opt-text { font-size: 14px; line-height: 1.55; color: var(--text); }
   .opt-value { font-size: 11px; color: var(--green-dark); font-weight: 500; margin-top: 3px; opacity: 0; transition: opacity 0.15s; }
   .option.picked .opt-value { opacity: 1; }
-
+ 
   .btn-next {
     display: block;
     width: 100%;
@@ -250,7 +253,7 @@
   .btn-next:disabled { opacity: 0.35; cursor: default; }
   .btn-next:not(:disabled):hover { background: var(--green-dark); }
   .btn-next:not(:disabled):active { transform: scale(0.98); }
-
+ 
   /* ── result ── */
   .result-hero {
     background: var(--white);
@@ -291,7 +294,7 @@
     border-radius: 20px;
     font-weight: 500;
   }
-
+ 
   .group-card {
     background: var(--white);
     border: 1px solid var(--border);
@@ -302,7 +305,7 @@
   .group-card-label { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 0.35rem; }
   .group-name { font-size: 18px; font-weight: 700; color: var(--text); }
   .group-tip { font-size: 13px; color: var(--text-sub); margin-top: 0.4rem; line-height: 1.6; }
-
+ 
   .all-types {
     background: var(--white);
     border: 1px solid var(--border);
@@ -330,7 +333,7 @@
     padding: 2px 8px;
     border-radius: 20px;
   }
-
+ 
   .btn-retry {
     display: block;
     width: 100%;
@@ -346,7 +349,7 @@
     transition: border-color 0.15s, color 0.15s;
   }
   .btn-retry:hover { border-color: var(--green); color: var(--green); }
-
+ 
   /* ── loading ── */
   #loading-screen {
     text-align: center;
@@ -362,19 +365,19 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-text { font-size: 14px; color: var(--text-sub); }
-
+ 
   /* ── footer ── */
   .footer { text-align: center; font-size: 12px; color: var(--text-muted); padding-top: 1.5rem; }
 </style>
 </head>
 <body>
 <div class="wrap">
-
+ 
   <div class="topbar">
     <div class="logo-mark"><span>🌿</span></div>
     <span class="brand">빌리지베이비 · 타운홀 2026</span>
   </div>
-
+ 
   <!-- INTRO -->
   <div id="s-intro" class="screen on">
     <div class="intro-hero">
@@ -394,7 +397,7 @@
     </div>
     <div class="footer">빌리지베이비 MVC 타운홀 · 2026</div>
   </div>
-
+ 
   <!-- NAME INPUT -->
   <div id="s-name" class="screen">
     <div class="name-card">
@@ -404,7 +407,7 @@
     <button class="btn-next" id="btn-name-next" onclick="startQuiz()" disabled>다음 →</button>
     <div class="footer" style="margin-top:1.5rem">빌리지베이비 MVC 타운홀 · 2026</div>
   </div>
-
+ 
   <!-- QUIZ -->
   <div id="s-quiz" class="screen">
     <div class="progress-track"><div class="progress-fill" id="prog"></div></div>
@@ -418,7 +421,7 @@
     </div>
     <button class="btn-next" id="btn-next" disabled onclick="nextQ()">다음 →</button>
   </div>
-
+ 
   <!-- LOADING -->
   <div id="s-loading" class="screen">
     <div id="loading-screen">
@@ -426,7 +429,7 @@
       <p class="loading-text">DNA 분석 중…</p>
     </div>
   </div>
-
+ 
   <!-- RESULT -->
   <div id="s-result" class="screen">
     <div class="result-hero" id="result-hero">
@@ -437,29 +440,29 @@
       <div class="result-desc" id="r-desc"></div>
       <div class="kw-row" id="r-kw"></div>
     </div>
-
+ 
     <div class="group-card">
       <div class="group-card-label">오늘 배정된 조</div>
       <div class="group-name" id="r-group"></div>
       <div class="group-tip" id="r-tip"></div>
     </div>
-
+ 
     <div class="all-types">
       <div class="all-types-title">빌베 DNA 5가지 유형</div>
       <div id="all-types-list"></div>
     </div>
-
+ 
     <button class="btn-retry" onclick="retry()">↺ 처음부터 다시</button>
     <div class="footer" style="margin-top:1.5rem">빌리지베이비 MVC 타운홀 · 2026</div>
   </div>
-
+ 
 </div>
-
+ 
 <script>
 // ── CONFIG ──────────────────────────────────────────
 // GAS 웹앱 URL을 여기에 입력하세요
 var GAS_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
-
+ 
 // ── DATA ────────────────────────────────────────────
 var Qs = [
   {
@@ -513,7 +516,7 @@ var Qs = [
     ]
   }
 ];
-
+ 
 var DNA = {
   CC: {
     name:'Customer Explorer', emoji:'🔍',
@@ -561,14 +564,14 @@ var DNA = {
     tip:'오늘 대화 주제: 요즘 가장 자랑하고 싶은 나의 임팩트는? (작아도 OK!)'
   }
 };
-
+ 
 var allTypes = ['CC','OT','PR','TT','OI'];
-
+ 
 // ── STATE ───────────────────────────────────────────
 var userName = '';
 var answers = [];
 var curQ = 0;
-
+ 
 // ── SCREENS ─────────────────────────────────────────
 function show(id) {
   var ss = document.querySelectorAll('.screen');
@@ -576,13 +579,13 @@ function show(id) {
   document.getElementById(id).classList.add('on');
   window.scrollTo(0,0);
 }
-
+ 
 function goName() { show('s-name'); }
-
+ 
 document.getElementById('name-input').addEventListener('input', function() {
   document.getElementById('btn-name-next').disabled = this.value.trim().length === 0;
 });
-
+ 
 function startQuiz() {
   userName = document.getElementById('name-input').value.trim();
   if (!userName) return;
@@ -591,7 +594,7 @@ function startQuiz() {
   show('s-quiz');
   renderQ();
 }
-
+ 
 // ── QUIZ ────────────────────────────────────────────
 function renderQ() {
   var q = Qs[curQ];
@@ -599,7 +602,7 @@ function renderQ() {
   document.getElementById('q-step').textContent = (curQ+1) + ' / ' + Qs.length;
   document.getElementById('prog').style.width = (curQ / Qs.length * 100) + '%';
   document.getElementById('q-text').textContent = q.text;
-
+ 
   var wrap = document.getElementById('options-wrap');
   wrap.innerHTML = '';
   q.opts.forEach(function(o) {
@@ -619,12 +622,12 @@ function renderQ() {
     });
     wrap.appendChild(el);
   });
-
+ 
   var btn = document.getElementById('btn-next');
   btn.disabled = true;
   btn.textContent = curQ === Qs.length-1 ? '결과 보기 →' : '다음 →';
 }
-
+ 
 function nextQ() {
   if (!answers[curQ]) return;
   if (curQ < Qs.length-1) {
@@ -634,7 +637,7 @@ function nextQ() {
     showLoading();
   }
 }
-
+ 
 // ── RESULT ──────────────────────────────────────────
 function tally() {
   var cnt = { CC:0, OT:0, PR:0, TT:0, OI:0 };
@@ -643,7 +646,7 @@ function tally() {
   Object.keys(cnt).forEach(function(k){ if(cnt[k]>max){ max=cnt[k]; top=k; } });
   return top;
 }
-
+ 
 function showLoading() {
   show('s-loading');
   setTimeout(function() {
@@ -652,21 +655,21 @@ function showLoading() {
     sendToGAS(userName, dna);
   }, 1400);
 }
-
+ 
 function renderResult(key) {
   var d = DNA[key];
-
+ 
   // badge + hero colors
   var badge = document.getElementById('r-badge');
   badge.textContent = '나의 빌베 DNA';
   badge.style.background = d.color;
   badge.style.color = d.tcolor;
-
+ 
   document.getElementById('r-emoji').textContent = d.emoji;
   document.getElementById('r-name').textContent = d.name;
   document.getElementById('r-value').textContent = 'Core Value: ' + d.value;
   document.getElementById('r-desc').textContent = d.desc;
-
+ 
   var kwRow = document.getElementById('r-kw');
   kwRow.innerHTML = '';
   d.kws.forEach(function(k) {
@@ -675,10 +678,10 @@ function renderResult(key) {
     s.textContent = k;
     kwRow.appendChild(s);
   });
-
+ 
   document.getElementById('r-group').textContent = d.group;
   document.getElementById('r-tip').textContent = d.tip;
-
+ 
   // all types list
   var list = document.getElementById('all-types-list');
   list.innerHTML = '';
@@ -695,10 +698,10 @@ function renderResult(key) {
       (t === key ? '<span class="type-mine">나</span>' : '');
     list.appendChild(row);
   });
-
+ 
   show('s-result');
 }
-
+ 
 function retry() {
   answers = [];
   curQ = 0;
@@ -706,7 +709,7 @@ function retry() {
   document.getElementById('btn-name-next').disabled = true;
   show('s-intro');
 }
-
+ 
 // ── GAS SUBMIT ──────────────────────────────────────
 function sendToGAS(name, dna) {
   var data = new FormData();
@@ -719,3 +722,4 @@ function sendToGAS(name, dna) {
 </script>
 </body>
 </html>
+ 
