@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>빌베 DNA 조편성 관리자</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#1D9E75;--gd:#0F6E56;--gl:#E1F5EE;
+  --bg:#F2F5F4;--w:#fff;--t:#1a1a1a;--ts:#5a6872;--tm:#9aabb5;--bd:#e2ece9;
+  --r:12px;--rs:8px;
+  --cc-bg:#E1F5EE;--cc-t:#085041;--cc-b:#1D9E75;
+  --ot-bg:#E6F1FB;--ot-t:#0C447C;--ot-b:#378ADD;
+  --pr-bg:#EEEDFE;--pr-t:#3C3489;--pr-b:#7F77DD;
+  --tt-bg:#FEF3E2;--tt-t:#633806;--tt-b:#EF9F27;
+  --oi-bg:#FAECE7;--oi-t:#993C1D;--oi-b:#D85A30;
+}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+
+/* header */
+.hdr{background:var(--w);border-bottom:1px solid var(--bd);padding:0 1.25rem;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100}
+.hdr-l{display:flex;align-items:center;gap:8px}
+.logo{width:26px;height:26px;background:var(--g);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.brand{font-size:14px;font-weight:700}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.btn-ref{background:var(--g);color:#fff;border:none;border-radius:var(--rs);padding:.4rem .9rem;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.btn-ref:hover{background:var(--gd)}
+.upd{font-size:12px;color:var(--tm)}
+.tag-live{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--g);background:var(--gl);border-radius:20px;padding:2px 8px}
+.tag-live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--g);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* login */
+#login{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 52px);padding:2rem}
+.login-card{background:var(--w);border:1px solid var(--bd);border-radius:var(--r);padding:2rem 1.75rem;width:100%;max-width:340px}
+.login-card .icon{font-size:32px;margin-bottom:.75rem}
+.login-card h2{font-size:18px;font-weight:700;margin-bottom:.3rem}
+.login-card p{font-size:13px;color:var(--ts);margin-bottom:1.5rem}
+.login-card input{width:100%;border:1.5px solid var(--bd);border-radius:var(--rs);padding:.65rem .85rem;font-size:14px;font-family:inherit;margin-bottom:.75rem;outline:none;transition:border-color .15s}
+.login-card input:focus{border-color:var(--g)}
+.btn-login{width:100%;background:var(--g);color:#fff;border:none;border-radius:var(--rs);padding:.7rem;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-login:hover{background:var(--gd)}
+.err{font-size:12px;color:#E24B4A;margin-top:.5rem;display:none}
+
+/* main */
+#main{display:none;padding:1.25rem;max-width:1280px;margin:0 auto}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:1.25rem}
+.stat{background:var(--w);border:1px solid var(--bd);border-radius:var(--r);padding:.9rem 1rem}
+.stat-lbl{font-size:10px;color:var(--tm);font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.25rem}
+.stat-n{font-size:26px;font-weight:700;line-height:1}
+.stat-sub{font-size:11px;color:var(--ts);margin-top:.2rem}
+
+/* dna bars */
+.dna-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:1.25rem}
+.dna-card{background:var(--w);border:1px solid var(--bd);border-radius:var(--r);padding:.9rem 1rem}
+.dna-pill{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-bottom:.45rem}
+.dna-emoji{font-size:20px;margin-bottom:.3rem;display:block}
+.dna-name{font-size:13px;font-weight:700;margin-bottom:.1rem}
+.dna-cv{font-size:10px;color:var(--tm);margin-bottom:.55rem}
+.bar-t{height:5px;background:var(--bd);border-radius:3px;overflow:hidden}
+.bar-f{height:100%;border-radius:3px;transition:width .6s ease}
+.dna-ct{font-size:12px;font-weight:700;margin-top:.35rem}
+
+/* section */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;margin-top:1.5rem}
+.sec-t{font-size:14px;font-weight:700}
+.sec-sub{font-size:12px;color:var(--tm)}
+.btn-export{border:1px solid var(--bd);background:var(--w);color:var(--t);border-radius:var(--rs);padding:.38rem .8rem;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:border-color .15s,color .15s}
+.btn-export:hover{border-color:var(--g);color:var(--g)}
+.btn-regroup{border:1px solid var(--g);background:var(--gl);color:var(--gd);border-radius:var(--rs);padding:.38rem .8rem;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.btn-regroup:hover{background:#c2edd9}
+
+/* group boards */
+.groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:1.25rem}
+.gb{background:var(--w);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.gb-head{padding:.75rem 1rem;border-bottom:1px solid var(--bd)}
+.gb-num{font-size:10px;font-weight:700;color:var(--tm);letter-spacing:.05em;text-transform:uppercase}
+.gb-name{font-size:15px;font-weight:700;margin-top:1px}
+.gb-meta{font-size:11px;color:var(--tm);margin-top:2px}
+.gb-diversity{display:flex;gap:6px;margin-top:6px}
+.div-badge{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700}
+.gb-body{padding:.25rem 0}
+.mrow{display:flex;align-items:center;gap:7px;padding:.4rem 1rem;border-bottom:1px solid var(--bd);font-size:13px}
+.mrow:last-child{border-bottom:none}
+.av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.mname{flex:1;font-weight:500;font-size:13px}
+.mteam{font-size:10px;color:var(--tm);white-space:nowrap}
+.mdna{font-size:13px}
+
+/* table */
+.tbl-wrap{background:var(--w);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+thead tr{background:var(--bg)}
+th{text-align:left;padding:.6rem 1rem;font-size:10px;font-weight:700;color:var(--tm);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--bd);white-space:nowrap}
+td{padding:.6rem 1rem;border-bottom:1px solid var(--bd)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg)}
+.tp{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:20px}
+.tg{font-weight:700;color:var(--g)}
+.ti{color:var(--tm);width:32px}
+.tt-col{color:var(--tm);white-space:nowrap;font-size:11px}
+
+/* empty */
+.empty{text-align:center;padding:3rem 1rem;color:var(--tm);font-size:14px}
+.empty span{font-size:32px;display:block;margin-bottom:.75rem}
+
+/* notice */
+.notice{background:#FEF3E2;border:1px solid #FAC775;border-radius:var(--rs);padding:.75rem 1rem;font-size:12px;color:#633806;margin-bottom:1rem;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-l">
+    <div class="logo">🌿</div>
+    <span class="brand">빌베 DNA · 조편성 관리자</span>
+  </div>
+  <div class="hdr-r">
+    <span class="upd" id="upd-txt"></span>
+    <span class="tag-live">LIVE</span>
+    <button class="btn-ref" onclick="loadData()">↺ 새로고침</button>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-card">
+    <div class="icon">🔐</div>
+    <h2>관리자 로그인</h2>
+    <p>빌리지베이비 타운홀 2026</p>
+    <input type="password" id="pw" placeholder="비밀번호 입력" onkeydown="if(event.key==='Enter')tryLogin()">
+    <button class="btn-login" onclick="tryLogin()">로그인</button>
+    <div class="err" id="err">비밀번호가 올바르지 않습니다.</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+  <!-- 통계 -->
+  <div class="stats">
+    <div class="stat"><div class="stat-lbl">총 참여자</div><div class="stat-n" id="s-total">—</div><div class="stat-sub">명 응답</div></div>
+    <div class="stat"><div class="stat-lbl">🔍 Customer</div><div class="stat-n" id="s-cc">—</div><div class="stat-sub">Explorer</div></div>
+    <div class="stat"><div class="stat-lbl">🤝 Team</div><div class="stat-n" id="s-ot">—</div><div class="stat-sub">Builder</div></div>
+    <div class="stat"><div class="stat-lbl">⚡ Action</div><div class="stat-n" id="s-pr">—</div><div class="stat-sub">Driver</div></div>
+    <div class="stat"><div class="stat-lbl">🚀 Speed</div><div class="stat-n" id="s-tt">—</div><div class="stat-sub">Runner</div></div>
+    <div class="stat"><div class="stat-lbl">🌟 Impact</div><div class="stat-n" id="s-oi">—</div><div class="stat-sub">Maker</div></div>
+  </div>
+
+  <!-- DNA 분포 -->
+  <div class="dna-row" id="dna-overview"></div>
+
+  <!-- 조편성 -->
+  <div class="sec-head">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="sec-t">조편성 현황</span>
+      <button class="btn-regroup" onclick="regroup()">🔄 재편성</button>
+    </div>
+    <button class="btn-export" onclick="exportCSV()">📥 CSV 내보내기</button>
+  </div>
+  <div class="notice" id="algo-notice">조편성 알고리즘: DNA 유형 다양성 우선 → 같은 팀 분산 → 조 크기 균등화</div>
+  <div class="groups" id="groups-grid"></div>
+
+  <!-- 전체 목록 -->
+  <div class="sec-head">
+    <span class="sec-t">전체 응답 목록</span>
+    <span class="sec-sub" id="tbl-cnt"></span>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th class="ti">#</th><th>이름</th><th>소속팀</th><th>DNA 유형</th><th>Core Value</th><th>배정 조</th><th class="tt-col">응답 시간</th></tr></thead>
+      <tbody id="tbl-body"></tbody>
+    </table>
+  </div>
+  <div style="height:2rem"></div>
+</div>
+
+<script>
+var GAS_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+var ADMIN_PW = 'vb2026!';
+
+var DNA = {
+  CC:{name:'Customer Explorer',emoji:'🔍',value:'Customer-centric',bg:'var(--cc-bg)',tc:'var(--cc-t)',bar:'var(--cc-b)'},
+  OT:{name:'Team Builder',emoji:'🤝',value:'One Team',bg:'var(--ot-bg)',tc:'var(--ot-t)',bar:'var(--ot-b)'},
+  PR:{name:'Action Driver',emoji:'⚡',value:'Proactive',bg:'var(--pr-bg)',tc:'var(--pr-t)',bar:'var(--pr-b)'},
+  TT:{name:'Speed Runner',emoji:'🚀',value:'Today not Tomorrow',bg:'var(--tt-bg)',tc:'var(--tt-t)',bar:'var(--tt-b)'},
+  OI:{name:'Impact Maker',emoji:'🌟',value:'Own Your Impact',bg:'var(--oi-bg)',tc:'var(--oi-t)',bar:'var(--oi-b)'}
+};
+var TEAMS_LABEL = {Product:'프로덕트',Commerce:'커머스',Marketing:'마케팅',Brand:'브랜드',Biz:'비즈'};
+var ORDER = ['CC','OT','PR','TT','OI'];
+var allData = [];
+var currentGroups = {};
+
+// ── LOGIN ─────────────────────────────────────────────
+function tryLogin(){
+  if(document.getElementById('pw').value === ADMIN_PW){
+    document.getElementById('login').style.display='none';
+    document.getElementById('main').style.display='block';
+    loadData();
+    setInterval(loadData, 30000);
+  } else {
+    document.getElementById('err').style.display='block';
+  }
+}
+
+// ── DATA ─────────────────────────────────────────────
+function loadData(){
+  document.getElementById('upd-txt').textContent='불러오는 중…';
+  fetch(GAS_URL+'?action=getAll')
+    .then(function(r){return r.json();})
+    .then(function(d){ allData=d||[]; render(); stamp(); })
+    .catch(function(){ allData=sample(); render(); document.getElementById('upd-txt').textContent='(샘플 데이터)'; });
+}
+function stamp(){
+  var n=new Date(); document.getElementById('upd-txt').textContent='업데이트 '+n.getHours()+':'+String(n.getMinutes()).padStart(2,'0');
+}
+
+function sample(){
+  var nm=['김지현','이혜준','박정윤','최수민','정진아','이연주','박두민','루시아','이예린','박민수',
+    '최소연','한재원','오수빈','장민지','윤혁준','강지우','임수진','정다은','김태민','이승호',
+    '박지영','최혁','김민아','이정우','박소희','정재원','한수진','오민준','장예원','윤지현','강민호'];
+  var dp=['CC','CC','CC','CC','CC','CC','CC','OT','OT','OT','OT','OT','OT',
+          'PR','PR','PR','PR','PR','PR','TT','TT','TT','TT','TT','TT','TT','OI','OI','OI','OI','OI'];
+  var tp=['Product','Product','Product','Product','Product','Product','Product',
+          'Commerce','Commerce','Commerce','Commerce','Commerce','Commerce',
+          'Marketing','Marketing','Marketing','Marketing','Marketing','Marketing',
+          'Brand','Brand','Brand','Brand','Brand',
+          'Biz','Biz','Biz','Biz','Biz','Biz','Biz'];
+  return nm.map(function(n,i){return{name:n,team:tp[i],dna:dp[i],dna_name:DNA[dp[i]].name,timestamp:new Date(Date.now()-i*120000).toISOString()};});
+}
+
+// ── ASSIGN GROUPS ─────────────────────────────────────
+// 그리디 + 점수 기반: DNA 다양성(+10/-5) + 팀 다양성(+8/-3) + 크기 균형(+2)
+function assignGroups(people, numGroups){
+  numGroups = numGroups || 6;
+  if(people.length === 0) return {};
+
+  var tgt = Math.floor(people.length / numGroups);
+  var extra = people.length % numGroups;
+  var sizes = [];
+  for(var i=0;i<numGroups;i++) sizes.push(i < extra ? tgt+1 : tgt);
+
+  var groups = [];
+  for(var i=0;i<numGroups;i++) groups.push([]);
+
+  // DNA 버킷별로 분류 → 각 버킷 내 팀 interleave
+  var queues = {};
+  ORDER.forEach(function(k){queues[k]=[];});
+  people.forEach(function(p){if(queues[p.dna]) queues[p.dna].push(p);});
+  ORDER.forEach(function(k){queues[k]=interleaveByTeam(queues[k]);});
+
+  // DNA 유형 순환 순서로 사람 목록 구성
+  var ordered = [];
+  var tmp = {};
+  ORDER.forEach(function(k){tmp[k]=queues[k].slice();});
+  var done = false;
+  while(!done){
+    done = true;
+    ORDER.forEach(function(k){if(tmp[k].length>0){ordered.push(tmp[k].shift());done=false;}});
+  }
+
+  // 각 사람을 점수 최고 조에 배정
+  ordered.forEach(function(person){
+    var best=-1, bestS=-Infinity;
+    for(var g=0;g<numGroups;g++){
+      if(groups[g].length >= sizes[g]) continue;
+      var s = score(groups[g], person, sizes[g]);
+      if(s > bestS){bestS=s; best=g;}
+    }
+    if(best===-1){
+      // fallback: 가장 적은 인원 조
+      best=0;
+      for(var g=1;g<numGroups;g++){if(groups[g].length<groups[best].length) best=g;}
+    }
+    groups[best].push(person);
+  });
+
+  var result = {};
+  groups.forEach(function(g,i){result[i+1]=g;});
+  return result;
+}
+
+function score(group, p, tgtSize){
+  var s = 0;
+  var dnaCnt = group.filter(function(m){return m.dna===p.dna;}).length;
+  s += dnaCnt===0 ? 10 : -5*dnaCnt;
+  var teamCnt = group.filter(function(m){return m.team===p.team;}).length;
+  s += teamCnt===0 ? 8 : -3*teamCnt;
+  s += (tgtSize - group.length) * 2;
+  return s;
+}
+
+function interleaveByTeam(members){
+  var bt={};
+  members.forEach(function(m){if(!bt[m.team])bt[m.team]=[];bt[m.team].push(m);});
+  var lists=Object.values(bt), res=[], more=true;
+  while(more){more=false;lists.forEach(function(l){if(l.length>0){res.push(l.shift());more=true;}});}
+  return res;
+}
+
+function regroup(){ currentGroups=assignGroups(allData,6); renderGroups(currentGroups); renderTable(allData,currentGroups); }
+
+// ── RENDER ────────────────────────────────────────────
+function render(){
+  var total=allData.length;
+  var cnt={CC:0,OT:0,PR:0,TT:0,OI:0};
+  allData.forEach(function(r){if(cnt[r.dna]!==undefined)cnt[r.dna]++;});
+  document.getElementById('s-total').textContent=total;
+  document.getElementById('s-cc').textContent=cnt.CC;
+  document.getElementById('s-ot').textContent=cnt.OT;
+  document.getElementById('s-pr').textContent=cnt.PR;
+  document.getElementById('s-tt').textContent=cnt.TT;
+  document.getElementById('s-oi').textContent=cnt.OI;
+
+  // DNA bars
+  var ov=document.getElementById('dna-overview'); ov.innerHTML='';
+  ORDER.forEach(function(k){
+    var d=DNA[k], pct=total>0?Math.round(cnt[k]/total*100):0;
+    var c=document.createElement('div'); c.className='dna-card';
+    c.innerHTML='<span class="dna-pill" style="background:'+d.bg+';color:'+d.tc+'">'+k+'</span>'
+      +'<span class="dna-emoji">'+d.emoji+'</span>'
+      +'<div class="dna-name">'+d.name+'</div>'
+      +'<div class="dna-cv">'+d.value+'</div>'
+      +'<div class="bar-t"><div class="bar-f" style="width:'+pct+'%;background:'+d.bar+'"></div></div>'
+      +'<div class="dna-ct">'+cnt[k]+'명 <span style="color:var(--tm);font-weight:400;font-size:11px">('+pct+'%)</span></div>';
+    ov.appendChild(c);
+  });
+
+  currentGroups = assignGroups(allData, 6);
+  renderGroups(currentGroups);
+  renderTable(allData, currentGroups);
+}
+
+function renderGroups(groups){
+  var grid=document.getElementById('groups-grid'); grid.innerHTML='';
+  var keys=Object.keys(groups).sort(function(a,b){return a-b;});
+  if(keys.length===0||allData.length===0){
+    grid.innerHTML='<div class="empty" style="grid-column:1/-1"><span>⏳</span>아직 응답이 없습니다.</div>';
+    return;
+  }
+
+  // 알고리즘 설명 업데이트
+  var totalPpl = allData.length;
+  document.getElementById('algo-notice').textContent =
+    '총 '+totalPpl+'명 → '+keys.length+'조 편성 | '
+    +'DNA 다양성 우선, 같은 팀 분산, 크기 균등 ('+
+    groups[keys[0]].length+'명~'+groups[keys[keys.length-1]].length+'명)';
+
+  keys.forEach(function(g){
+    var members=groups[g];
+    var uniqDNA=new Set(members.map(function(m){return m.dna;})).size;
+    var uniqTeam=new Set(members.map(function(m){return m.team;})).size;
+    var dnaOK=uniqDNA>=Math.min(5,members.length);
+    var teamOK=uniqTeam>=Math.min(5,members.length);
+
+    var board=document.createElement('div'); board.className='gb';
+    var body=members.length===0
+      ?'<div style="padding:1rem;font-size:13px;color:var(--tm)">배정 대기</div>'
+      :members.map(function(m){
+          var d=DNA[m.dna]||{emoji:'?',bg:'#eee',tc:'#333'};
+          var teamLabel=TEAMS_LABEL[m.team]||m.team||'—';
+          return '<div class="mrow">'
+            +'<div class="av" style="background:'+d.bg+';color:'+d.tc+'">'+m.name.slice(0,1)+'</div>'
+            +'<span class="mname">'+m.name+'</span>'
+            +'<span class="mteam">'+teamLabel+'</span>'
+            +'<span class="mdna">'+d.emoji+'</span>'
+          +'</div>';
+        }).join('');
+
+    board.innerHTML=
+      '<div class="gb-head">'
+        +'<div class="gb-num">Group '+g+'</div>'
+        +'<div class="gb-name">'+g+'조</div>'
+        +'<div class="gb-meta">'+members.length+'명</div>'
+        +'<div class="gb-diversity">'
+          +'<span class="div-badge" style="background:'+(dnaOK?'var(--gl)':'#FEF3E2')+';color:'+(dnaOK?'var(--gd)':'#633806')+'">DNA '+uniqDNA+'/5</span>'
+          +'<span class="div-badge" style="background:'+(teamOK?'var(--gl)':'#FEF3E2')+';color:'+(teamOK?'var(--gd)':'#633806')+'">팀 '+uniqTeam+'/5</span>'
+        +'</div>'
+      +'</div>'
+      +'<div class="gb-body">'+body+'</div>';
+    grid.appendChild(board);
+  });
+}
+
+function renderTable(data, groups){
+  var lookup={};
+  Object.keys(groups).forEach(function(g){groups[g].forEach(function(m){lookup[m.name]=g;});});
+  document.getElementById('tbl-cnt').textContent=data.length+'명';
+  var tbody=document.getElementById('tbl-body');
+  if(data.length===0){
+    tbody.innerHTML='<tr><td colspan="7"><div class="empty"><span>⏳</span>응답 대기 중</div></td></tr>';
+    return;
+  }
+  var sorted=data.slice().sort(function(a,b){return new Date(b.timestamp)-new Date(a.timestamp);});
+  tbody.innerHTML=sorted.map(function(r,i){
+    var d=DNA[r.dna]||{emoji:'?',name:r.dna_name||r.dna,value:'-',bg:'#eee',tc:'#333'};
+    var tl=TEAMS_LABEL[r.team]||r.team||'—';
+    var grp=lookup[r.name]||'—';
+    return '<tr>'
+      +'<td class="ti">'+(sorted.length-i)+'</td>'
+      +'<td style="font-weight:500">'+r.name+'</td>'
+      +'<td style="font-size:12px;color:var(--ts)">'+tl+'</td>'
+      +'<td><span class="tp" style="background:'+d.bg+';color:'+d.tc+'">'+d.emoji+' '+d.name+'</span></td>'
+      +'<td style="font-size:11px;color:var(--tm)">'+d.value+'</td>'
+      +'<td class="tg">'+grp+'조</td>'
+      +'<td class="tt-col">'+fmtTime(r.timestamp)+'</td>'
+    +'</tr>';
+  }).join('');
+}
+
+// ── UTILS ─────────────────────────────────────────────
+function fmtTime(iso){
+  try{var d=new Date(iso);return(d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+  catch(e){return'';}
+}
+
+function exportCSV(){
+  if(allData.length===0){alert('데이터가 없습니다.');return;}
+  var rows=[['이름','소속팀','DNA유형','Core Value','배정조','응답시간']];
+  allData.forEach(function(r){
+    var d=DNA[r.dna]||{name:r.dna_name||r.dna,value:'-'};
+    var grp=currentGroups[Object.keys(currentGroups).find(function(g){return currentGroups[g].some(function(m){return m.name===r.name;});})]
+             ? Object.keys(currentGroups).find(function(g){return currentGroups[g].some(function(m){return m.name===r.name;});})+'조' : '—';
+    rows.push([r.name,TEAMS_LABEL[r.team]||r.team||'—',d.name,d.value,grp,r.timestamp||'']);
+  });
+  var csv='\uFEFF'+rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a'); a.href=url; a.download='vb-dna-groups-'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
