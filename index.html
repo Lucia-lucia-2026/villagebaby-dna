@@ -1,6 +1,3 @@
-
-
-Index · HTML
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -8,718 +5,337 @@ Index · HTML
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>나의 빌베 DNA 찾기</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
- 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
- 
-  :root {
-    --green: #1D9E75;
-    --green-dark: #0F6E56;
-    --green-light: #E1F5EE;
-    --green-mid: #9FE1CB;
-    --bg: #F7FAF9;
-    --white: #ffffff;
-    --text: #1a1a1a;
-    --text-sub: #5a6872;
-    --text-muted: #9aabb5;
-    --border: #e2ece9;
-    --radius: 14px;
-    --radius-sm: 8px;
-  }
- 
-  body {
-    font-family: 'Noto Sans KR', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 2rem 1rem 4rem;
-  }
- 
-  .wrap {
-    width: 100%;
-    max-width: 480px;
-  }
- 
-  /* ── top bar ── */
-  .topbar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 2rem;
-  }
-  .logo-mark {
-    width: 28px; height: 28px;
-    background: var(--green);
-    border-radius: 7px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .logo-mark span { font-size: 14px; }
-  .brand { font-size: 13px; font-weight: 700; color: var(--green-dark); letter-spacing: -0.2px; }
- 
-  /* ── screen toggle ── */
-  .screen { display: none; }
-  .screen.on { display: block; }
- 
-  /* ── intro ── */
-  .intro-hero {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 2.5rem 2rem 2rem;
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-  .dna-icon {
-    font-size: 52px;
-    margin-bottom: 1rem;
-    display: block;
-    animation: float 3s ease-in-out infinite;
-  }
-  @keyframes float {
-    0%,100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-  }
-  .intro-title {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    color: var(--text);
-    margin-bottom: 0.6rem;
-  }
-  .intro-title em { color: var(--green); font-style: normal; }
-  .intro-desc {
-    font-size: 14px;
-    color: var(--text-sub);
-    line-height: 1.75;
-    margin-bottom: 1.75rem;
-  }
-  .meta-pills {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 1.75rem;
-  }
-  .pill {
-    font-size: 12px;
-    color: var(--green-dark);
-    background: var(--green-light);
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-weight: 500;
-  }
-  .btn-start {
-    display: block;
-    width: 100%;
-    background: var(--green);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 0.85rem;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    letter-spacing: -0.2px;
-    transition: background 0.15s, transform 0.1s;
-  }
-  .btn-start:hover { background: var(--green-dark); }
-  .btn-start:active { transform: scale(0.98); }
- 
-  .name-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 1rem;
-  }
-  .name-card label {
-    display: block;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-sub);
-    margin-bottom: 0.5rem;
-  }
-  .name-card input {
-    width: 100%;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 0.65rem 0.85rem;
-    font-size: 15px;
-    font-family: inherit;
-    color: var(--text);
-    background: var(--bg);
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  .name-card input:focus { border-color: var(--green); background: #fff; }
-  .name-card input::placeholder { color: var(--text-muted); }
- 
-  /* ── quiz ── */
-  .progress-track {
-    height: 4px;
-    background: var(--border);
-    border-radius: 2px;
-    margin-bottom: 1.5rem;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: var(--green);
-    border-radius: 2px;
-    transition: width 0.4s cubic-bezier(.4,0,.2,1);
-  }
-  .q-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-  .q-num {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--green);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-  .q-step { font-size: 12px; color: var(--text-muted); }
-  .q-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-  }
-  .q-text {
-    font-size: 17px;
-    font-weight: 700;
-    line-height: 1.55;
-    letter-spacing: -0.3px;
-    margin-bottom: 1.25rem;
-  }
-  .option {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 0.75rem 1rem;
-    margin-bottom: 0.5rem;
-    cursor: pointer;
-    transition: border-color 0.15s, background 0.15s;
-    background: #fff;
-  }
-  .option:last-child { margin-bottom: 0; }
-  .option:hover { border-color: var(--green-mid); background: var(--green-light); }
-  .option.picked { border-color: var(--green); background: var(--green-light); }
-  .opt-key {
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    background: var(--bg);
-    border: 1.5px solid var(--border);
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--text-muted);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    margin-top: 1px;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
-  }
-  .option.picked .opt-key {
-    background: var(--green);
-    border-color: var(--green);
-    color: #fff;
-  }
-  .opt-body { flex: 1; }
-  .opt-text { font-size: 14px; line-height: 1.55; color: var(--text); }
-  .opt-value { font-size: 11px; color: var(--green-dark); font-weight: 500; margin-top: 3px; opacity: 0; transition: opacity 0.15s; }
-  .option.picked .opt-value { opacity: 1; }
- 
-  .btn-next {
-    display: block;
-    width: 100%;
-    background: var(--green);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 0.8rem;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.1s, opacity 0.15s;
-    letter-spacing: -0.2px;
-  }
-  .btn-next:disabled { opacity: 0.35; cursor: default; }
-  .btn-next:not(:disabled):hover { background: var(--green-dark); }
-  .btn-next:not(:disabled):active { transform: scale(0.98); }
- 
-  /* ── result ── */
-  .result-hero {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 2rem 1.5rem 1.75rem;
-    text-align: center;
-    margin-bottom: 1rem;
-    position: relative;
-    overflow: hidden;
-  }
-  .result-hero::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 4px;
-    background: var(--green);
-  }
-  .result-badge {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    padding: 3px 10px;
-    border-radius: 20px;
-    margin-bottom: 1rem;
-  }
-  .result-emoji { font-size: 52px; display: block; margin-bottom: 0.75rem; }
-  .result-name { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 0.3rem; }
-  .result-value-tag { font-size: 13px; font-weight: 500; color: var(--text-sub); margin-bottom: 1rem; }
-  .result-desc { font-size: 14px; color: var(--text-sub); line-height: 1.75; text-align: left; }
-  .kw-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 1.25rem; }
-  .kw {
-    font-size: 12px; color: var(--green-dark);
-    background: var(--green-light);
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-weight: 500;
-  }
- 
-  .group-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 1rem;
-  }
-  .group-card-label { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 0.35rem; }
-  .group-name { font-size: 18px; font-weight: 700; color: var(--text); }
-  .group-tip { font-size: 13px; color: var(--text-sub); margin-top: 0.4rem; line-height: 1.6; }
- 
-  .all-types {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 1rem;
-  }
-  .all-types-title { font-size: 13px; font-weight: 500; color: var(--text-sub); margin-bottom: 0.75rem; }
-  .type-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .type-row:last-child { border-bottom: none; }
-  .type-emoji { font-size: 18px; width: 28px; text-align: center; }
-  .type-info { flex: 1; }
-  .type-name { font-size: 13px; font-weight: 700; color: var(--text); }
-  .type-cv { font-size: 11px; color: var(--text-muted); }
-  .type-mine {
-    font-size: 11px; font-weight: 700;
-    background: var(--green);
-    color: #fff;
-    padding: 2px 8px;
-    border-radius: 20px;
-  }
- 
-  .btn-retry {
-    display: block;
-    width: 100%;
-    border: 1.5px solid var(--border);
-    background: transparent;
-    border-radius: var(--radius-sm);
-    padding: 0.75rem;
-    font-size: 14px;
-    color: var(--text-sub);
-    cursor: pointer;
-    font-family: inherit;
-    font-weight: 500;
-    transition: border-color 0.15s, color 0.15s;
-  }
-  .btn-retry:hover { border-color: var(--green); color: var(--green); }
- 
-  /* ── loading ── */
-  #loading-screen {
-    text-align: center;
-    padding: 4rem 0;
-  }
-  .spinner {
-    width: 32px; height: 32px;
-    border: 3px solid var(--border);
-    border-top-color: var(--green);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    margin: 0 auto 1rem;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-text { font-size: 14px; color: var(--text-sub); }
- 
-  /* ── footer ── */
-  .footer { text-align: center; font-size: 12px; color: var(--text-muted); padding-top: 1.5rem; }
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#1D9E75;--gd:#0F6E56;--gl:#E1F5EE;--gm:#9FE1CB;
+  --bg:#F7FAF9;--w:#fff;--t:#1a1a1a;--ts:#5a6872;--tm:#9aabb5;--bd:#e2ece9;
+  --r:14px;--rs:8px;
+}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem 4rem}
+.wrap{width:100%;max-width:480px}
+.topbar{display:flex;align-items:center;gap:8px;margin-bottom:2rem}
+.logo{width:28px;height:28px;background:var(--g);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.brand{font-size:13px;font-weight:700;color:var(--gd);letter-spacing:-.2px}
+.screen{display:none}.screen.on{display:block}
+
+/* intro */
+.hero{background:var(--w);border:1px solid var(--bd);border-radius:var(--r);padding:2.5rem 2rem 2rem;text-align:center;margin-bottom:1rem}
+.dna-icon{font-size:52px;margin-bottom:1rem;display:block;animation:fl 3s ease-in-out infinite}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+h1{font-size:22px;font-weight:700;letter-spacing:-.5px;margin-bottom:.6rem}
+h1 em{color:var(--g);font-style:normal}
+.desc{font-size:14px;color:var(--ts);line-height:1.75;margin-bottom:1.75rem}
+.pills{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:1.75rem}
+.pill{font-size:12px;color:var(--gd);background:var(--gl);border-radius:20px;padding:4px 12px;font-weight:500}
+
+/* inputs */
+.input-card{background:var(--w);border:1px solid var(--bd);border-radius:var(--r);padding:1.25rem 1.5rem;margin-bottom:1rem}
+.input-card label{display:block;font-size:13px;font-weight:500;color:var(--ts);margin-bottom:.5rem}
+.input-card input,.input-card select{width:100%;border:1.5px solid var(--bd);border-radius:var(--rs);padding:.65rem .85rem;font-size:15px;font-family:inherit;color:var(--t);background:var(--bg);outline:none;transition:border-color .15s;appearance:none;-webkit-appearance:none}
+.input-card input:focus,.input-card select:focus{border-color:var(--g);background:#fff}
+.input-card input::placeholder{color:var(--tm)}
+.select-wrap{position:relative}
+.select-wrap::after{content:'▾';position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--tm);pointer-events:none;font-size:13px}
+.input-card select{cursor:pointer}
+.input-card select option[value=""]{color:var(--tm)}
+
+/* buttons */
+.btn{display:block;width:100%;background:var(--g);color:#fff;border:none;border-radius:var(--rs);padding:.82rem;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-.2px;transition:background .15s,transform .1s;font-family:inherit}
+.btn:hover{background:var(--gd)}.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.35;cursor:default}
+.btn-ghost{background:transparent;border:1.5px solid var(--bd);color:var(--ts)}
+.btn-ghost:hover{border-color:var(--g);color:var(--g);background:transparent}
+
+/* quiz */
+.prog-track{height:4px;background:var(--bd);border-radius:2px;margin-bottom:1.5rem;overflow:hidden}
+.prog-fill{height:100%;background:var(--g);border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.q-num{font-size:11px;font-weight:700;color:var(--g);letter-spacing:.08em;text-transform:uppercase}
+.q-step{font-size:12px;color:var(--tm)}
+.q-card{background:var(--w);border:1px solid var(--bd);border-radius:var(--r);padding:1.5rem;margin-bottom:1rem}
+.q-text{font-size:17px;font-weight:700;line-height:1.55;letter-spacing:-.3px;margin-bottom:1.25rem}
+.opt{display:flex;align-items:flex-start;gap:10px;border:1.5px solid var(--bd);border-radius:var(--rs);padding:.75rem 1rem;margin-bottom:.5rem;cursor:pointer;transition:border-color .15s,background .15s;background:#fff}
+.opt:last-child{margin-bottom:0}
+.opt:hover{border-color:var(--gm);background:var(--gl)}
+.opt.picked{border-color:var(--g);background:var(--gl)}
+.opt-k{width:22px;height:22px;border-radius:50%;background:var(--bg);border:1.5px solid var(--bd);font-size:11px;font-weight:700;color:var(--tm);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:background .15s,border-color .15s,color .15s}
+.opt.picked .opt-k{background:var(--g);border-color:var(--g);color:#fff}
+.opt-b{flex:1}
+.opt-t{font-size:14px;line-height:1.55;color:var(--t)}
+.opt-v{font-size:11px;color:var(--gd);font-weight:500;margin-top:3px;opacity:0;transition:opacity .15s}
+.opt.picked .opt-v{opacity:1}
+
+/* result */
+.res-hero{background:var(--w);border:1px solid var(--bd);border-radius:var(--r);padding:2rem 1.5rem 1.75rem;text-align:center;margin-bottom:1rem;position:relative;overflow:hidden}
+.res-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--g)}
+.res-badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:1rem}
+.res-emoji{font-size:52px;display:block;margin-bottom:.75rem}
+.res-name{font-size:26px;font-weight:700;letter-spacing:-.5px;margin-bottom:.3rem}
+.res-tag{font-size:13px;font-weight:500;color:var(--ts);margin-bottom:1rem}
+.res-desc{font-size:14px;color:var(--ts);line-height:1.75;text-align:left}
+.kw-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:1.25rem}
+.kw{font-size:12px;color:var(--gd);background:var(--gl);padding:4px 10px;border-radius:20px;font-weight:500}
+.info-card{background:var(--w);border:1px solid var(--bd);border-radius:var(--r);padding:1.25rem 1.5rem;margin-bottom:1rem}
+.info-label{font-size:12px;color:var(--tm);font-weight:500;margin-bottom:.35rem}
+.info-val{font-size:17px;font-weight:700;color:var(--t)}
+.info-sub{font-size:13px;color:var(--ts);margin-top:.4rem;line-height:1.6}
+.share-note{background:var(--gl);border-radius:var(--rs);padding:1rem 1.25rem;margin-bottom:1rem;font-size:13px;color:var(--gd);line-height:1.65;font-weight:500}
+
+/* loading */
+#s-loading{text-align:center;padding:4rem 0}
+.spinner{width:32px;height:32px;border:3px solid var(--bd);border-top-color:var(--g);border-radius:50%;animation:sp .7s linear infinite;margin:0 auto 1rem}
+@keyframes sp{to{transform:rotate(360deg)}}
+.loading-t{font-size:14px;color:var(--ts)}
+.footer{text-align:center;font-size:12px;color:var(--tm);padding-top:1.5rem}
 </style>
 </head>
 <body>
 <div class="wrap">
- 
   <div class="topbar">
-    <div class="logo-mark"><span>🌿</span></div>
+    <div class="logo">🌿</div>
     <span class="brand">빌리지베이비 · 타운홀 2026</span>
   </div>
- 
+
   <!-- INTRO -->
   <div id="s-intro" class="screen on">
-    <div class="intro-hero">
+    <div class="hero">
       <span class="dna-icon">🧬</span>
-      <h1 class="intro-title">나의 <em>빌베 DNA</em> 찾기</h1>
-      <p class="intro-desc">
-        우리가 함께 일하는 방식, Core Value 속에<br>
-        나를 가장 닮은 DNA를 찾아보세요.<br>
-        결과로 오늘의 아이스브레이킹 조가 편성됩니다!
-      </p>
-      <div class="meta-pills">
+      <h1>나의 <em>빌베 DNA</em> 찾기</h1>
+      <p class="desc">우리가 함께 일하는 방식, Core Value 속에<br>나를 가장 닮은 DNA를 찾아보세요.<br>결과로 오늘의 아이스브레이킹 조가 편성됩니다!</p>
+      <div class="pills">
         <span class="pill">⏱ 약 3분</span>
         <span class="pill">📝 5가지 질문</span>
         <span class="pill">🎯 5가지 유형</span>
       </div>
-      <button class="btn-start" onclick="goName()">시작하기 →</button>
+      <button class="btn" onclick="show('s-name')">시작하기 →</button>
     </div>
     <div class="footer">빌리지베이비 MVC 타운홀 · 2026</div>
   </div>
- 
-  <!-- NAME INPUT -->
+
+  <!-- NAME + TEAM -->
   <div id="s-name" class="screen">
-    <div class="name-card">
-      <label for="name-input">먼저 이름을 알려주세요 👋</label>
-      <input id="name-input" type="text" placeholder="예) 홍길동" maxlength="10" autocomplete="off">
+    <div class="input-card">
+      <label for="inp-name">이름 👋</label>
+      <input id="inp-name" type="text" placeholder="예) 홍길동" maxlength="10" autocomplete="off" oninput="checkName()">
     </div>
-    <button class="btn-next" id="btn-name-next" onclick="startQuiz()" disabled>다음 →</button>
+    <div class="input-card">
+      <label for="inp-team">소속 팀 🏷️</label>
+      <div class="select-wrap">
+        <select id="inp-team" onchange="checkName()">
+          <option value="">팀을 선택해주세요</option>
+          <option value="Product">프로덕트팀</option>
+          <option value="Commerce">커머스팀</option>
+          <option value="Marketing">마케팅팀</option>
+          <option value="Brand">브랜드팀</option>
+          <option value="Biz">비즈팀</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" id="btn-name" onclick="startQuiz()" disabled>다음 →</button>
     <div class="footer" style="margin-top:1.5rem">빌리지베이비 MVC 타운홀 · 2026</div>
   </div>
- 
+
   <!-- QUIZ -->
   <div id="s-quiz" class="screen">
-    <div class="progress-track"><div class="progress-fill" id="prog"></div></div>
+    <div class="prog-track"><div class="prog-fill" id="prog"></div></div>
     <div class="q-meta">
       <span class="q-num" id="q-num">Q1</span>
       <span class="q-step" id="q-step">1 / 5</span>
     </div>
     <div class="q-card">
       <div class="q-text" id="q-text"></div>
-      <div id="options-wrap"></div>
+      <div id="opts"></div>
     </div>
-    <button class="btn-next" id="btn-next" disabled onclick="nextQ()">다음 →</button>
+    <button class="btn" id="btn-next" disabled onclick="nextQ()">다음 →</button>
   </div>
- 
+
   <!-- LOADING -->
   <div id="s-loading" class="screen">
-    <div id="loading-screen">
-      <div class="spinner"></div>
-      <p class="loading-text">DNA 분석 중…</p>
-    </div>
+    <div class="spinner"></div>
+    <p class="loading-t">나의 빌베 DNA 분석 중…</p>
   </div>
- 
+
   <!-- RESULT -->
   <div id="s-result" class="screen">
-    <div class="result-hero" id="result-hero">
-      <span class="result-badge" id="r-badge">나의 빌베 DNA</span>
-      <span class="result-emoji" id="r-emoji"></span>
-      <div class="result-name" id="r-name"></div>
-      <div class="result-value-tag" id="r-value"></div>
-      <div class="result-desc" id="r-desc"></div>
+    <div class="res-hero" id="r-hero">
+      <span class="res-badge" id="r-badge">나의 빌베 DNA</span>
+      <span class="res-emoji" id="r-emoji"></span>
+      <div class="res-name" id="r-name"></div>
+      <div class="res-tag" id="r-tag"></div>
+      <div class="res-desc" id="r-desc"></div>
       <div class="kw-row" id="r-kw"></div>
     </div>
- 
-    <div class="group-card">
-      <div class="group-card-label">오늘 배정된 조</div>
-      <div class="group-name" id="r-group"></div>
-      <div class="group-tip" id="r-tip"></div>
+    <div class="share-note" id="r-share"></div>
+    <div class="info-card">
+      <div class="info-label">오늘 대화 주제 💬</div>
+      <div class="info-sub" id="r-tip"></div>
     </div>
- 
-    <div class="all-types">
-      <div class="all-types-title">빌베 DNA 5가지 유형</div>
-      <div id="all-types-list"></div>
+    <div class="info-card">
+      <div class="info-label">빌베 DNA 5가지 유형</div>
+      <div id="r-all-types"></div>
     </div>
- 
-    <button class="btn-retry" onclick="retry()">↺ 처음부터 다시</button>
+    <button class="btn btn-ghost" style="margin-top:.5rem" onclick="retry()">↺ 처음부터 다시</button>
     <div class="footer" style="margin-top:1.5rem">빌리지베이비 MVC 타운홀 · 2026</div>
   </div>
- 
 </div>
- 
+
 <script>
-// ── CONFIG ──────────────────────────────────────────
-// GAS 웹앱 URL을 여기에 입력하세요
 var GAS_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
- 
-// ── DATA ────────────────────────────────────────────
+
 var Qs = [
-  {
-    text: '일할 때 내가 가장 자주 하는 생각은?',
-    opts: [
-      { k:'A', t:'고객은 어떻게 느낄까? 엄빠 입장에서 봐야 해.', v:'CC', label:'Customer-centric' },
-      { k:'B', t:'우리 팀 말고 회사 전체에 도움이 될까?', v:'OT', label:'One Team' },
-      { k:'C', t:'누가 시키기 전에 내가 먼저 찾아보자.', v:'PR', label:'Proactive' },
-      { k:'D', t:'일단 실행해보자, 해보면 알지!', v:'TT', label:'Today not Tomorrow' },
-      { k:'E', t:'결과가 나왔는지 끝까지 확인하고 책임져야지.', v:'OI', label:'Own Your Impact' }
-    ]
-  },
-  {
-    text: '동료가 나에게 가장 많이 해주는 칭찬은?',
-    opts: [
-      { k:'A', t:'항상 고객 관점에서 생각하더라.', v:'CC', label:'Customer-centric' },
-      { k:'B', t:'혼자 해결하기 어려운 일도 팀을 연결해줘서 고마워.', v:'OT', label:'One Team' },
-      { k:'C', t:'시키지 않아도 먼저 나서서 해결하더라.', v:'PR', label:'Proactive' },
-      { k:'D', t:'실행력이 정말 빠르고 추진력 있어.', v:'TT', label:'Today not Tomorrow' },
-      { k:'E', t:'맡은 건 끝까지 책임지는 사람이야.', v:'OI', label:'Own Your Impact' }
-    ]
-  },
-  {
-    text: '회의에서 결정이 내 의견과 다르게 났을 때 나는?',
-    opts: [
-      { k:'A', t:'고객에게 더 좋은 방향인지 다시 확인하고 싶어.', v:'CC', label:'Customer-centric' },
-      { k:'B', t:'팀이 정했으면 나도 함께 최선을 다한다.', v:'OT', label:'One Team' },
-      { k:'C', t:'다음엔 더 좋은 대안을 먼저 가져오면 되지.', v:'PR', label:'Proactive' },
-      { k:'D', t:'일단 진행해보자, 해보면서 개선할 수 있어.', v:'TT', label:'Today not Tomorrow' },
-      { k:'E', t:'결과로 증명하면 된다. 묵묵히 실행한다.', v:'OI', label:'Own Your Impact' }
-    ]
-  },
-  {
-    text: '시간이 부족한 상황에서 나의 선택은?',
-    opts: [
-      { k:'A', t:'조금 더 걸려도 엄빠가 만족할 완성도를 맞춘다.', v:'CC', label:'Customer-centric' },
-      { k:'B', t:'팀원에게 솔직하게 공유하고 함께 해결책을 찾는다.', v:'OT', label:'One Team' },
-      { k:'C', t:'내가 먼저 플랜B를 만들어서 제안한다.', v:'PR', label:'Proactive' },
-      { k:'D', t:'60%라도 먼저 내보내고 개선한다.', v:'TT', label:'Today not Tomorrow' },
-      { k:'E', t:'내 파트만큼은 최선을 다해 책임지고 완수한다.', v:'OI', label:'Own Your Impact' }
-    ]
-  },
-  {
-    text: '나에게 가장 잘 어울리는 빌베 문장은?',
-    opts: [
-      { k:'A', t:'"이게 엄빠가 원하는 게 맞나?"', v:'CC', label:'Customer-centric' },
-      { k:'B', t:'"이런 문제가 있는데 도움을 주실 수 있는 분?"', v:'OT', label:'One Team' },
-      { k:'C', t:'"이건 제가 직접 해볼게요."', v:'PR', label:'Proactive' },
-      { k:'D', t:'"해보면 되지!"', v:'TT', label:'Today not Tomorrow' },
-      { k:'E', t:'"나는 팀에 이런 기여 중이구나!"', v:'OI', label:'Own Your Impact' }
-    ]
-  }
+  { text:'일하다가 문득 떠오르는 생각, 나랑 가장 비슷한 건?', opts:[
+    {k:'A',t:'이게 고객 입장에서도 좋은 걸까?',v:'CC',l:'Customer-centric'},
+    {k:'B',t:'우리 팀뿐 아니라 회사 전체에도 도움이 될까?',v:'OT',l:'One Team'},
+    {k:'C',t:'어, 이거 내가 한번 해봐도 되겠는데?',v:'PR',l:'Proactive'},
+    {k:'D',t:'일단 해보자, 해봐야 알지!',v:'TT',l:'Today not Tomorrow'},
+    {k:'E',t:'이게 어떤 결과로 이어졌는지 확인해봐야겠다.',v:'OI',l:'Own Your Impact'}
+  ]},
+  { text:'동료들이 나한테 자주 하는 말은?', opts:[
+    {k:'A',t:'고객 생각을 항상 먼저 하는 것 같아.',v:'CC',l:'Customer-centric'},
+    {k:'B',t:'이런 걸 공유해줘서 고마워, 몰랐는데.',v:'OT',l:'One Team'},
+    {k:'C',t:'어떻게 그걸 먼저 생각했어?',v:'PR',l:'Proactive'},
+    {k:'D',t:'추진력 진짜 좋다.',v:'TT',l:'Today not Tomorrow'},
+    {k:'E',t:'믿고 맡길 수 있어서 편해.',v:'OI',l:'Own Your Impact'}
+  ]},
+  { text:'회의 결론이 내 생각과 달랐을 때 나는?', opts:[
+    {k:'A',t:'고객한테는 어떤 방향이 더 나을지 한번 더 생각해봄.',v:'CC',l:'Customer-centric'},
+    {k:'B',t:'결정됐으면 팀이랑 같이 맞춰서 가야지.',v:'OT',l:'One Team'},
+    {k:'C',t:'다음엔 더 좋은 안을 미리 준비해서 가야겠다.',v:'PR',l:'Proactive'},
+    {k:'D',t:'해보면서 고치면 되지, 일단 가보자.',v:'TT',l:'Today not Tomorrow'},
+    {k:'E',t:'내 파트에서 좋은 결과 내면 자연히 보이겠지.',v:'OI',l:'Own Your Impact'}
+  ]},
+  { text:'시간이 빠듯할 때 내가 택하는 방식은?', opts:[
+    {k:'A',t:'조금 늦어도 고객이 실망하지 않을 수준은 맞추고 싶어.',v:'CC',l:'Customer-centric'},
+    {k:'B',t:'팀원한테 솔직하게 얘기하고 같이 방법을 찾아봄.',v:'OT',l:'One Team'},
+    {k:'C',t:'플랜B를 먼저 만들어서 옵션을 드려봄.',v:'PR',l:'Proactive'},
+    {k:'D',t:'60%라도 먼저 내고 다듬어가는 게 낫더라.',v:'TT',l:'Today not Tomorrow'},
+    {k:'E',t:'내 담당 범위는 어떻게든 완성해서 넘김.',v:'OI',l:'Own Your Impact'}
+  ]},
+  { text:'나랑 가장 잘 맞는 빌베 분위기는?', opts:[
+    {k:'A',t:'고객이 어떻게 쓸지 상상하면서 만드는 것.',v:'CC',l:'Customer-centric'},
+    {k:'B',t:'팀 경계 없이 서로 묻고 도와주는 것.',v:'OT',l:'One Team'},
+    {k:'C',t:'기다리기보다 먼저 치고 나가는 것.',v:'PR',l:'Proactive'},
+    {k:'D',t:'고민보다 실행, 빠르게 배우는 것.',v:'TT',l:'Today not Tomorrow'},
+    {k:'E',t:'내가 한 일이 어떤 변화를 만들었는지 보는 것.',v:'OI',l:'Own Your Impact'}
+  ]}
 ];
- 
+
 var DNA = {
-  CC: {
-    name:'Customer Explorer', emoji:'🔍',
-    value:'Customer-centric',
-    color:'#E1F5EE', tcolor:'#085041',
-    desc:'엄빠의 불안과 불편에서 언제나 출발하는 사람. 작은 디테일 하나도 고객 입장에서 바라보고, 판단이 어려울 때 답을 고객에게서 찾습니다. "두유노우 베이비빌리?"를 외칠 준비가 언제나 되어 있어요.',
-    kws:['공감', '고객 관점', '디테일', '목소리 경청'],
-    group:'Customer Explorer 조 🔍',
-    tip:'오늘 대화 주제: 우리 서비스에서 엄빠가 가장 감동받을 순간은?'
-  },
-  OT: {
-    name:'Team Builder', emoji:'🤝',
-    value:'One Team',
-    color:'#E6F1FB', tcolor:'#0C447C',
-    desc:'팀 경계를 허물고 전사 목표를 우선하는 사람. 알게 된 맥락과 노하우를 먼저 공유하며, "내 일 아니야"를 입에 담지 않습니다. 가장 든든한 동료이자 연결자입니다.',
-    kws:['협업', '공유', '연결', 'Team Spirit'],
-    group:'Team Builder 조 🤝',
-    tip:'오늘 대화 주제: 다른 팀과 협업해서 예상보다 잘 됐던 순간은?'
-  },
-  PR: {
-    name:'Action Driver', emoji:'⚡',
-    value:'Proactive',
-    color:'#EEEDFE', tcolor:'#3C3489',
-    desc:'누가 시키기 전에 이미 해결책을 들고 오는 사람. 단순 보고가 아닌 근거 있는 대안과 추천을 먼저 꺼내고, 방향이 정해지면 내 의견과 달라도 200% 몰입합니다.',
-    kws:['주도성', '선제적 행동', '대안 제시', '몰입'],
-    group:'Action Driver 조 ⚡',
-    tip:'오늘 대화 주제: 시키지 않았는데 스스로 먼저 해봐서 잘 됐던 경험은?'
-  },
-  TT: {
-    name:'Speed Runner', emoji:'🚀',
-    value:'Today not Tomorrow',
-    color:'#FEF3E2', tcolor:'#633806',
-    desc:'오늘 60%가 내일 100%보다 강하다고 믿는 사람. "안되는 이유"보다 "어떻게든 실행할 방법"을 먼저 찾고, 가장 힘든 순간에도 One more step을 내딛습니다.',
-    kws:['실행력', '속도', '결정력', '스타트업 DNA'],
-    group:'Speed Runner 조 🚀',
-    tip:'오늘 대화 주제: 60%짜리로 일단 했다가 나중에 더 좋아진 사례는?'
-  },
-  OI: {
-    name:'Impact Maker', emoji:'🌟',
-    value:'Own Your Impact',
-    color:'#FAECE7', tcolor:'#993C1D',
-    desc:'내 일이 조직과 엄빠에게 어떤 영향을 주는지 스스로 고민하는 사람. 어려운 터널에서도 Stay Cheerful함을 잃지 않으며, 책임감과 긍정 에너지로 팀 전체의 사기를 올립니다.',
-    kws:['책임감', '긍정 에너지', 'Stay Cheerful', '임팩트'],
-    group:'Impact Maker 조 🌟',
-    tip:'오늘 대화 주제: 요즘 가장 자랑하고 싶은 나의 임팩트는? (작아도 OK!)'
-  }
+  CC:{name:'Customer Explorer',emoji:'🔍',value:'Customer-centric',bg:'#E1F5EE',tc:'#085041',
+    desc:'엄빠의 불안과 불편에서 언제나 출발하는 사람. 작은 디테일 하나도 고객 입장에서 바라보고, 판단이 어려울 때 답을 고객에게서 찾습니다.',
+    kws:['공감','고객 관점','디테일','목소리 경청'],
+    tip:'우리 서비스에서 엄빠가 가장 감동받을 순간은 어디일까요?'},
+  OT:{name:'Team Builder',emoji:'🤝',value:'One Team',bg:'#E6F1FB',tc:'#0C447C',
+    desc:'팀 경계를 허물고 전사 목표를 우선하는 사람. 알게 된 맥락과 노하우를 먼저 공유하며, 가장 든든한 동료이자 연결자입니다.',
+    kws:['협업','공유','연결','Team Spirit'],
+    tip:'다른 팀과 협업해서 예상보다 잘 됐던 순간이 있었나요?'},
+  PR:{name:'Action Driver',emoji:'⚡',value:'Proactive',bg:'#EEEDFE',tc:'#3C3489',
+    desc:'누가 시키기 전에 이미 해결책을 들고 오는 사람. 근거 있는 대안과 추천을 먼저 꺼내고, 방향이 정해지면 200% 몰입합니다.',
+    kws:['주도성','선제적 행동','대안 제시','몰입'],
+    tip:'시키지 않았는데 스스로 먼저 해봐서 잘 됐던 경험을 나눠보세요.'},
+  TT:{name:'Speed Runner',emoji:'🚀',value:'Today not Tomorrow',bg:'#FEF3E2',tc:'#633806',
+    desc:'오늘 60%가 내일 100%보다 강하다고 믿는 사람. "안되는 이유"보다 "어떻게든 실행할 방법"을 먼저 찾습니다.',
+    kws:['실행력','속도','결정력','스타트업 DNA'],
+    tip:'60%짜리로 일단 했다가 나중에 더 좋아진 사례가 있나요?'},
+  OI:{name:'Impact Maker',emoji:'🌟',value:'Own Your Impact',bg:'#FAECE7',tc:'#993C1D',
+    desc:'내 일이 조직과 엄빠에게 어떤 영향을 주는지 스스로 고민하는 사람. 어려운 상황에서도 Stay Cheerful함을 잃지 않습니다.',
+    kws:['책임감','긍정 에너지','Stay Cheerful','임팩트'],
+    tip:'요즘 가장 자랑하고 싶은 나의 임팩트는 무엇인가요? (작아도 OK!)'}
 };
- 
-var allTypes = ['CC','OT','PR','TT','OI'];
- 
-// ── STATE ───────────────────────────────────────────
-var userName = '';
-var answers = [];
-var curQ = 0;
- 
-// ── SCREENS ─────────────────────────────────────────
-function show(id) {
-  var ss = document.querySelectorAll('.screen');
-  for (var i=0; i<ss.length; i++) ss[i].classList.remove('on');
-  document.getElementById(id).classList.add('on');
-  window.scrollTo(0,0);
+
+var ORDER = ['CC','OT','PR','TT','OI'];
+
+var userName='', userTeam='', answers=[], curQ=0;
+
+function show(id){ document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on')}); document.getElementById(id).classList.add('on'); window.scrollTo(0,0); }
+
+function checkName(){
+  var n=document.getElementById('inp-name').value.trim();
+  var t=document.getElementById('inp-team').value;
+  document.getElementById('btn-name').disabled = !(n && t);
 }
- 
-function goName() { show('s-name'); }
- 
-document.getElementById('name-input').addEventListener('input', function() {
-  document.getElementById('btn-name-next').disabled = this.value.trim().length === 0;
-});
- 
-function startQuiz() {
-  userName = document.getElementById('name-input').value.trim();
-  if (!userName) return;
-  answers = [];
-  curQ = 0;
-  show('s-quiz');
-  renderQ();
+
+function startQuiz(){
+  userName=document.getElementById('inp-name').value.trim();
+  userTeam=document.getElementById('inp-team').value;
+  if(!userName||!userTeam) return;
+  answers=[]; curQ=0;
+  show('s-quiz'); renderQ();
 }
- 
-// ── QUIZ ────────────────────────────────────────────
-function renderQ() {
-  var q = Qs[curQ];
-  document.getElementById('q-num').textContent = 'Q' + (curQ+1);
-  document.getElementById('q-step').textContent = (curQ+1) + ' / ' + Qs.length;
-  document.getElementById('prog').style.width = (curQ / Qs.length * 100) + '%';
-  document.getElementById('q-text').textContent = q.text;
- 
-  var wrap = document.getElementById('options-wrap');
-  wrap.innerHTML = '';
-  q.opts.forEach(function(o) {
-    var el = document.createElement('div');
-    el.className = 'option';
-    el.innerHTML =
-      '<div class="opt-key">' + o.k + '</div>' +
-      '<div class="opt-body">' +
-        '<div class="opt-text">' + o.t + '</div>' +
-        '<div class="opt-value">→ ' + o.label + '</div>' +
-      '</div>';
-    el.addEventListener('click', function() {
-      document.querySelectorAll('.option').forEach(function(x){ x.classList.remove('picked'); });
-      el.classList.add('picked');
-      answers[curQ] = o.v;
-      document.getElementById('btn-next').disabled = false;
+
+function renderQ(){
+  var q=Qs[curQ];
+  document.getElementById('q-num').textContent='Q'+(curQ+1);
+  document.getElementById('q-step').textContent=(curQ+1)+' / '+Qs.length;
+  document.getElementById('prog').style.width=(curQ/Qs.length*100)+'%';
+  document.getElementById('q-text').textContent=q.text;
+  var wrap=document.getElementById('opts'); wrap.innerHTML='';
+  q.opts.forEach(function(o){
+    var el=document.createElement('div'); el.className='opt';
+    el.innerHTML='<div class="opt-k">'+o.k+'</div><div class="opt-b"><div class="opt-t">'+o.t+'</div><div class="opt-v">→ '+o.l+'</div></div>';
+    el.addEventListener('click',function(){
+      document.querySelectorAll('.opt').forEach(function(x){x.classList.remove('picked')});
+      el.classList.add('picked'); answers[curQ]=o.v;
+      document.getElementById('btn-next').disabled=false;
     });
     wrap.appendChild(el);
   });
- 
-  var btn = document.getElementById('btn-next');
-  btn.disabled = true;
-  btn.textContent = curQ === Qs.length-1 ? '결과 보기 →' : '다음 →';
+  document.getElementById('btn-next').disabled=true;
+  document.getElementById('btn-next').textContent=curQ===Qs.length-1?'결과 보기 →':'다음 →';
 }
- 
-function nextQ() {
-  if (!answers[curQ]) return;
-  if (curQ < Qs.length-1) {
-    curQ++;
-    renderQ();
-  } else {
-    showLoading();
-  }
+
+function nextQ(){
+  if(!answers[curQ]) return;
+  if(curQ<Qs.length-1){ curQ++; renderQ(); } else { showLoading(); }
 }
- 
-// ── RESULT ──────────────────────────────────────────
-function tally() {
-  var cnt = { CC:0, OT:0, PR:0, TT:0, OI:0 };
-  answers.forEach(function(a){ cnt[a]++; });
-  var top = 'CC', max = 0;
-  Object.keys(cnt).forEach(function(k){ if(cnt[k]>max){ max=cnt[k]; top=k; } });
+
+function tally(){
+  var cnt={CC:0,OT:0,PR:0,TT:0,OI:0};
+  answers.forEach(function(a){cnt[a]++});
+  var top='CC',max=0;
+  Object.keys(cnt).forEach(function(k){if(cnt[k]>max){max=cnt[k];top=k;}});
   return top;
 }
- 
-function showLoading() {
-  show('s-loading');
-  setTimeout(function() {
-    var dna = tally();
-    renderResult(dna);
-    sendToGAS(userName, dna);
-  }, 1400);
-}
- 
-function renderResult(key) {
-  var d = DNA[key];
- 
-  // badge + hero colors
-  var badge = document.getElementById('r-badge');
-  badge.textContent = '나의 빌베 DNA';
-  badge.style.background = d.color;
-  badge.style.color = d.tcolor;
- 
-  document.getElementById('r-emoji').textContent = d.emoji;
-  document.getElementById('r-name').textContent = d.name;
-  document.getElementById('r-value').textContent = 'Core Value: ' + d.value;
-  document.getElementById('r-desc').textContent = d.desc;
- 
-  var kwRow = document.getElementById('r-kw');
-  kwRow.innerHTML = '';
-  d.kws.forEach(function(k) {
-    var s = document.createElement('span');
-    s.className = 'kw';
-    s.textContent = k;
-    kwRow.appendChild(s);
+
+function showLoading(){ show('s-loading'); setTimeout(function(){ var dna=tally(); renderResult(dna); sendToGAS(userName,userTeam,dna); },1400); }
+
+function renderResult(key){
+  var d=DNA[key];
+  var badge=document.getElementById('r-badge');
+  badge.style.background=d.bg; badge.style.color=d.tc;
+  document.getElementById('r-emoji').textContent=d.emoji;
+  document.getElementById('r-name').textContent=d.name;
+  document.getElementById('r-tag').textContent='Core Value: '+d.value;
+  document.getElementById('r-desc').textContent=d.desc;
+  var kw=document.getElementById('r-kw'); kw.innerHTML='';
+  d.kws.forEach(function(k){var s=document.createElement('span');s.className='kw';s.textContent=k;kw.appendChild(s);});
+  document.getElementById('r-share').innerHTML='📣 <strong>'+userName+'</strong>님은 <strong>'+d.emoji+' '+d.name+'</strong>!\n오늘 타운홀에서 같은 이모지를 찾아보세요 😄';
+  document.getElementById('r-tip').textContent=d.tip;
+  var at=document.getElementById('r-all-types'); at.innerHTML='';
+  ORDER.forEach(function(t){
+    var dd=DNA[t];
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:10px;padding:.5rem 0;border-bottom:1px solid var(--bd)';
+    if(t===ORDER[ORDER.length-1]) row.style.borderBottom='none';
+    row.innerHTML='<span style="font-size:18px;width:28px;text-align:center">'+dd.emoji+'</span>'
+      +'<div style="flex:1"><div style="font-size:13px;font-weight:700">'+dd.name+'</div>'
+      +'<div style="font-size:11px;color:var(--tm)">'+dd.value+'</div></div>'
+      +(t===key?'<span style="font-size:11px;font-weight:700;background:var(--g);color:#fff;padding:2px 8px;border-radius:20px">나</span>':'');
+    at.appendChild(row);
   });
- 
-  document.getElementById('r-group').textContent = d.group;
-  document.getElementById('r-tip').textContent = d.tip;
- 
-  // all types list
-  var list = document.getElementById('all-types-list');
-  list.innerHTML = '';
-  allTypes.forEach(function(t) {
-    var dd = DNA[t];
-    var row = document.createElement('div');
-    row.className = 'type-row';
-    row.innerHTML =
-      '<span class="type-emoji">' + dd.emoji + '</span>' +
-      '<div class="type-info">' +
-        '<div class="type-name">' + dd.name + '</div>' +
-        '<div class="type-cv">' + dd.value + '</div>' +
-      '</div>' +
-      (t === key ? '<span class="type-mine">나</span>' : '');
-    list.appendChild(row);
-  });
- 
   show('s-result');
 }
- 
-function retry() {
-  answers = [];
-  curQ = 0;
-  document.getElementById('name-input').value = '';
-  document.getElementById('btn-name-next').disabled = true;
-  show('s-intro');
-}
- 
-// ── GAS SUBMIT ──────────────────────────────────────
-function sendToGAS(name, dna) {
-  var data = new FormData();
-  data.append('name', name);
-  data.append('dna', dna);
-  data.append('dna_name', DNA[dna].name);
-  data.append('timestamp', new Date().toISOString());
-  fetch(GAS_URL, { method:'POST', body:data, mode:'no-cors' }).catch(function(){});
+
+function retry(){ answers=[]; curQ=0; document.getElementById('inp-name').value=''; document.getElementById('inp-team').value=''; document.getElementById('btn-name').disabled=true; show('s-intro'); }
+
+function sendToGAS(name,team,dna){
+  var fd=new FormData();
+  fd.append('name',name); fd.append('team',team);
+  fd.append('dna',dna); fd.append('dna_name',DNA[dna].name);
+  fd.append('timestamp',new Date().toISOString());
+  fetch(GAS_URL,{method:'POST',body:fd,mode:'no-cors'}).catch(function(){});
 }
 </script>
 </body>
 </html>
- 
