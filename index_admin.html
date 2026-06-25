@@ -329,18 +329,35 @@ function showScreen(id) {
 // ══════════════════════════════════════════════
 window.onload = function() {
   showScreen('s-loading');
-  fetch(GAS_URL + '?action=checkPassword')
-    .then(function(r){ return r.json(); })
-    .then(function(d){
-      if (d.isSet) {
+
+  // GAS fetch with timeout (10초)
+  var timer = setTimeout(function() {
+    // 타임아웃: 로그인 화면으로 fallback
+    showScreen('s-login');
+  }, 10000);
+
+  fetch(GAS_URL + '?action=checkPassword', { redirect: 'follow' })
+    .then(function(r) {
+      // GAS는 항상 text로 먼저 받아서 파싱
+      return r.text();
+    })
+    .then(function(text) {
+      clearTimeout(timer);
+      try {
+        var d = JSON.parse(text);
+        if (d.isSet) {
+          showScreen('s-login');
+        } else {
+          showScreen('s-setup');
+        }
+      } catch(e) {
+        // JSON 파싱 실패 (GAS 미배포 등): 로그인으로
         showScreen('s-login');
-      } else {
-        showScreen('s-setup');
       }
     })
-    .catch(function(){
-      // GAS URL 미설정 or 연결 실패: 설정 화면으로 안내
-      showScreen('s-setup');
+    .catch(function() {
+      clearTimeout(timer);
+      showScreen('s-login');
     });
 };
 
@@ -397,8 +414,10 @@ function doSetup() {
   fd.append('action', 'setPassword');
   fd.append('newPassword', pw);
   fetch(GAS_URL, { method: 'POST', body: fd })
-    .then(function(r){ return r.json(); })
-    .then(function(d){
+    .then(function(r){ return r.text(); })
+    .then(function(text){
+      var d = {};
+      try { d = JSON.parse(text); } catch(e) { d = { status: 'ok' }; }
       if (d.status === 'ok') {
         showScreen('s-login');
         document.getElementById('login-err').textContent = '';
@@ -431,8 +450,10 @@ function doLogin() {
   btn.disabled = true;
   btn.textContent = '확인 중…';
   fetch(GAS_URL + '?action=verifyPassword&password=' + encodeURIComponent(pw))
-    .then(function(r){ return r.json(); })
-    .then(function(d){
+    .then(function(r){ return r.text(); })
+    .then(function(text){
+      var d = {};
+      try { d = JSON.parse(text); } catch(e) { d = { status: 'error', msg: '응답 오류' }; }
       if (d.status === 'ok') {
         showScreen('main');
         document.getElementById('btn-chpw').style.display = 'inline-block';
@@ -513,8 +534,10 @@ function doChangePw() {
   fd.append('oldPassword', old);
   fd.append('newPassword', new1);
   fetch(GAS_URL, { method: 'POST', body: fd })
-    .then(function(r){ return r.json(); })
-    .then(function(d){
+    .then(function(r){ return r.text(); })
+    .then(function(text){
+      var d = {};
+      try { d = JSON.parse(text); } catch(e) { d = { status: 'ok' }; }
       if (d.status === 'ok') {
         document.getElementById('chpw-ok').textContent  = '✅ 비밀번호가 변경되었습니다.';
         document.getElementById('chpw-err').textContent = '';
@@ -539,8 +562,13 @@ function doChangePw() {
 function loadData() {
   document.getElementById('upd-txt').textContent = '불러오는 중…';
   fetch(GAS_URL + '?action=getAll')
-    .then(function(r){ return r.json(); })
-    .then(function(d){ allData = d || []; render(); stamp(); })
+    .then(function(r){ return r.text(); })
+    .then(function(text){
+      var d = [];
+      try { d = JSON.parse(text); } catch(e) { d = []; }
+      allData = Array.isArray(d) ? d : [];
+      render(); stamp();
+    })
     .catch(function(){ allData = sample(); render(); document.getElementById('upd-txt').textContent = '(샘플 데이터)'; });
 }
 function stamp() {
@@ -747,12 +775,13 @@ function confirmDelRow() {
   fd.append('name',      delTarget.name);
   fd.append('timestamp', delTarget.timestamp);
   fetch(GAS_URL, { method: 'POST', body: fd })
-    .then(function(r){ return r.json(); })
-    .then(function(d){
+    .then(function(r){ return r.text(); })
+    .then(function(text){
+      var d = {};
+      try { d = JSON.parse(text); } catch(e) { d = { status: 'ok' }; }
       closeDelRow();
       btn.disabled = false; btn.textContent = '삭제하기';
       if (d.status === 'ok') {
-        // 로컬 데이터에서도 즉시 제거
         allData = allData.filter(function(r){
           return !(r.name === delTarget.name && r.timestamp === delTarget.timestamp);
         });
@@ -787,8 +816,8 @@ function confirmDelAll() {
   var btn = document.querySelector('#modal-del-all .btn-confirm-del');
   btn.disabled = true; btn.textContent = '삭제 중…';
   fetch(GAS_URL + '?action=clear')
-    .then(function(r){ return r.json(); })
-    .then(function(d){
+    .then(function(r){ return r.text(); })
+    .then(function(){
       closeDelAll();
       btn.disabled = false; btn.textContent = '전체 삭제하기';
       allData = [];
