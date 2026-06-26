@@ -271,8 +271,19 @@ tr:hover td{background:var(--bg)}
   </div>
   <div class="dna-row" id="dna-overview"></div>
   <div class="sec-head">
-    <div style="display:flex;align-items:center;gap:8px">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
       <span class="sec-t">조편성 현황</span>
+      <!-- 조 수 선택 토글 -->
+      <div style="display:flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--bd);border-radius:20px;padding:3px 4px">
+        <button id="btn-g5" onclick="setNumGroups(5)"
+          style="border:none;border-radius:16px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s,color .15s;background:transparent;color:var(--tm)">
+          5조
+        </button>
+        <button id="btn-g6" onclick="setNumGroups(6)"
+          style="border:none;border-radius:16px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s,color .15s;background:var(--g);color:#fff">
+          6조
+        </button>
+      </div>
       <button class="btn-regroup" onclick="regroup()">🔄 재편성</button>
     </div>
     <button class="btn-export" onclick="exportCSV()">📥 CSV 내보내기</button>
@@ -642,7 +653,26 @@ function interleaveByTeam(members) {
   while (more) { more = false; lists.forEach(function(l){ if (l.length > 0) { res.push(l.shift()); more = true; } }); }
   return res;
 }
-function regroup() { currentGroups = assignGroups(allData, 6); renderGroups(currentGroups); renderTable(allData, currentGroups); }
+var numGroups = 6; // 기본값 6조
+
+function setNumGroups(n) {
+  numGroups = n;
+  // 토글 버튼 스타일 업데이트
+  document.getElementById('btn-g5').style.background = n === 5 ? 'var(--g)' : 'transparent';
+  document.getElementById('btn-g5').style.color      = n === 5 ? '#fff'     : 'var(--tm)';
+  document.getElementById('btn-g6').style.background = n === 6 ? 'var(--g)' : 'transparent';
+  document.getElementById('btn-g6').style.color      = n === 6 ? '#fff'     : 'var(--tm)';
+  // 즉시 재편성
+  currentGroups = assignGroups(allData, numGroups);
+  renderGroups(currentGroups);
+  renderTable(allData, currentGroups);
+}
+
+function regroup() {
+  currentGroups = assignGroups(allData, numGroups);
+  renderGroups(currentGroups);
+  renderTable(allData, currentGroups);
+}
 
 // ══════════════════════════════════════════════
 // 렌더링
@@ -669,7 +699,7 @@ function render() {
       + '<div class="dna-ct">'+cnt[k]+'명 <span style="color:var(--tm);font-weight:400;font-size:11px">('+pct+'%)</span></div>';
     ov.appendChild(c);
   });
-  currentGroups = assignGroups(allData, 6);
+  currentGroups = assignGroups(allData, numGroups);
   renderGroups(currentGroups);
   renderTable(allData, currentGroups);
 }
