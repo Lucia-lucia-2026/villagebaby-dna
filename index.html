@@ -8,7 +8,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --g:#1D9E75;--gd:#0F6E56;--gl:#E1F5EE;--gm:#9FE1CB;
+  --g:#2D7CD2;--gd:#1A5BA8;--gl:#EBF3FC;--gm:#90BEE8;
   --bg:#F7FAF9;--w:#fff;--t:#1a1a1a;--ts:#5a6872;--tm:#9aabb5;--bd:#e2ece9;
   --r:14px;--rs:8px;
 }
@@ -222,7 +222,7 @@ var Qs = [
 ];
 
 var DNA = {
-  CC:{name:'Customer Explorer',emoji:'🔍',value:'Customer-centric',bg:'#E1F5EE',tc:'#085041',
+  CC:{name:'Customer Explorer',emoji:'🔍',value:'Customer-centric',bg:'#EBF3FC',tc:'#0E3D7A',
     desc:'엄빠의 불안과 불편에서 언제나 출발하는 사람. 작은 디테일 하나도 고객 입장에서 바라보고, 판단이 어려울 때 답을 고객에게서 찾습니다.',
     kws:['공감','고객 관점','디테일','목소리 경청'],
     tip:'우리 서비스에서 엄빠가 가장 감동받을 순간은 어디일까요?'},
@@ -330,11 +330,17 @@ function renderResult(key){
 function retry(){ answers=[]; curQ=0; document.getElementById('inp-name').value=''; document.getElementById('inp-team').value=''; document.getElementById('btn-name').disabled=true; show('s-intro'); }
 
 function sendToGAS(name,team,dna){
-  var fd=new FormData();
-  fd.append('name',name); fd.append('team',team);
-  fd.append('dna',dna); fd.append('dna_name',DNA[dna].name);
-  fd.append('timestamp',new Date().toISOString());
-  fetch(GAS_URL,{method:'POST',body:fd,mode:'no-cors'}).catch(function(){});
+  var params = [
+    'action=submit',
+    'name='      + encodeURIComponent(name),
+    'team='      + encodeURIComponent(team),
+    'dna='       + encodeURIComponent(dna),
+    'dna_name='  + encodeURIComponent(DNA[dna].name),
+    'timestamp=' + encodeURIComponent(new Date().toISOString())
+  ].join('&');
+  fetch(GAS_URL + '?' + params, { method:'GET' })
+    .then(function(r){ return r.text(); })
+    .catch(function(){});
 }
 </script>
 </body>
