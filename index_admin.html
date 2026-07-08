@@ -603,15 +603,15 @@ function sample() {
 // ══════════════════════════════════════════════
 // 조편성 알고리즘
 // ══════════════════════════════════════════════
-function assignGroups(people, numGroups) {
-  numGroups = numGroups || 6;
+function assignGroups(people, nGroups) {
+  nGroups = nGroups || 6;
   if (people.length === 0) return {};
-  var tgt   = Math.floor(people.length / numGroups);
-  var extra = people.length % numGroups;
+  var tgt   = Math.floor(people.length / nGroups);
+  var extra = people.length % nGroups;
   var sizes = [];
-  for (var i = 0; i < numGroups; i++) sizes.push(i < extra ? tgt + 1 : tgt);
+  for (var i = 0; i < nGroups; i++) sizes.push(i < extra ? tgt + 1 : tgt);
   var groups = [];
-  for (var i = 0; i < numGroups; i++) groups.push([]);
+  for (var i = 0; i < nGroups; i++) groups.push([]);
   var queues = {};
   ORDER.forEach(function(k){ queues[k] = []; });
   people.forEach(function(p){ if (queues[p.dna]) queues[p.dna].push(p); });
@@ -625,12 +625,12 @@ function assignGroups(people, numGroups) {
   }
   ordered.forEach(function(person) {
     var best = -1, bestS = -Infinity;
-    for (var g = 0; g < numGroups; g++) {
+    for (var g = 0; g < nGroups; g++) {
       if (groups[g].length >= sizes[g]) continue;
       var s = scoreGroup(groups[g], person, sizes[g]);
       if (s > bestS) { bestS = s; best = g; }
     }
-    if (best === -1) { best = 0; for (var g = 1; g < numGroups; g++) { if (groups[g].length < groups[best].length) best = g; } }
+    if (best === -1) { best = 0; for (var g = 1; g < nGroups; g++) { if (groups[g].length < groups[best].length) best = g; } }
     groups[best].push(person);
   });
   var result = {};
@@ -648,27 +648,35 @@ function scoreGroup(group, p, tgtSize) {
 }
 function interleaveByTeam(members) {
   var bt = {};
-  members.forEach(function(m){ if (!bt[m.team]) bt[m.team] = []; bt[m.team].push(m); });
-  var lists = Object.values(bt), res = [], more = true;
-  while (more) { more = false; lists.forEach(function(l){ if (l.length > 0) { res.push(l.shift()); more = true; } }); }
+  members.forEach(function(m){
+    var key = (m.team && m.team !== '') ? m.team : '_none';
+    if (!bt[key]) bt[key] = [];
+    bt[key].push(m);
+  });
+  var lists = Object.keys(bt).map(function(k){ return bt[k]; });
+  var res = [], more = true;
+  while (more) {
+    more = false;
+    lists.forEach(function(l){ if (l.length > 0) { res.push(l.shift()); more = true; } });
+  }
   return res;
 }
 var numGroups = 6; // 기본값 6조
 
 function setNumGroups(n) {
   numGroups = n;
-  // 토글 버튼 스타일 업데이트
   document.getElementById('btn-g5').style.background = n === 5 ? 'var(--g)' : 'transparent';
   document.getElementById('btn-g5').style.color      = n === 5 ? '#fff'     : 'var(--tm)';
   document.getElementById('btn-g6').style.background = n === 6 ? 'var(--g)' : 'transparent';
   document.getElementById('btn-g6').style.color      = n === 6 ? '#fff'     : 'var(--tm)';
-  // 즉시 재편성
+  if (!allData || allData.length === 0) return;
   currentGroups = assignGroups(allData, numGroups);
   renderGroups(currentGroups);
   renderTable(allData, currentGroups);
 }
 
 function regroup() {
+  if (!allData || allData.length === 0) return;
   currentGroups = assignGroups(allData, numGroups);
   renderGroups(currentGroups);
   renderTable(allData, currentGroups);
