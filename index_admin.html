@@ -323,7 +323,7 @@ var DNA = {
   TT:{name:'Speed Runner',     emoji:'🚀',value:'Today not Tomorrow',bg:'var(--tt-bg)',tc:'var(--tt-t)',bar:'var(--tt-b)'},
   OI:{name:'Impact Maker',     emoji:'🌟',value:'Own Your Impact',  bg:'var(--oi-bg)',tc:'var(--oi-t)',bar:'var(--oi-b)'}
 };
-var TEAM_LABEL = {Product:'프로덕트',Commerce:'커머스',Marketing:'마케팅',Brand:'브랜드',Biz:'비즈'};
+var TEAM_LABEL = {Product:'프로덕트',Commerce:'커머스',Marketing:'마케팅',Brand:'브랜드',Biz:'비즈',GA:'GA'};
 var ORDER = ['CC','OT','PR','TT','OI'];
 
 // ════════════════════════════════════════
@@ -604,6 +604,15 @@ function doRegroup() {
 // ════════════════════════════════════════
 // 조편성 알고리즘 (그리디)
 // ════════════════════════════════════════
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
 function calcGroups(people, n) {
   if (!people || people.length === 0) return {};
   var tgt   = Math.floor(people.length / n);
@@ -614,7 +623,8 @@ function calcGroups(people, n) {
   var buckets = {};
   ORDER.forEach(function(k) { buckets[k] = []; });
   people.forEach(function(p) { if (buckets[p.dna]) buckets[p.dna].push(p); });
-  ORDER.forEach(function(k) { buckets[k] = spreadByTeam(buckets[k]); });
+  // 재편성 클릭마다 다른 결과가 나오도록 각 DNA 버킷을 셔플
+  ORDER.forEach(function(k) { buckets[k] = spreadByTeam(shuffle(buckets[k])); });
 
   // DNA 유형 순환으로 배정 순서 결정
   var queue = [];
@@ -630,19 +640,25 @@ function calcGroups(people, n) {
   var groups = [];
   for (var i = 0; i < n; i++) groups.push([]);
 
-  // 그리디: 점수 최고 조에 배정
+  // 그리디: 점수 최고 조에 배정 (동점이면 랜덤 선택)
   queue.forEach(function(person) {
-    var best = -1, bestScore = -Infinity;
+    var bestScore = -Infinity;
+    var candidates = [];
     for (var g = 0; g < n; g++) {
       if (groups[g].length >= sizes[g]) continue;
       var sc = groupScore(groups[g], person, sizes[g]);
-      if (sc > bestScore) { bestScore = sc; best = g; }
+      if (sc > bestScore) { bestScore = sc; candidates = [g]; }
+      else if (sc === bestScore) { candidates.push(g); }
     }
-    if (best === -1) {
+    var best;
+    if (candidates.length === 0) {
+      // 모든 조가 목표 크기 도달 → 인원 가장 적은 조에 배정
       best = 0;
       for (var g = 1; g < n; g++) {
         if (groups[g].length < groups[best].length) best = g;
       }
+    } else {
+      best = candidates[Math.floor(Math.random() * candidates.length)];
     }
     groups[best].push(person);
   });
