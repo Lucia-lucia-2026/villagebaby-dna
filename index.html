@@ -294,9 +294,12 @@ function nextQ(){
 function tally(){
   var cnt={CC:0,OT:0,PR:0,TT:0,OI:0};
   answers.forEach(function(a){cnt[a]++});
-  var top='CC',max=0;
-  Object.keys(cnt).forEach(function(k){if(cnt[k]>max){max=cnt[k];top=k;}});
-  return top;
+  var max=0;
+  Object.keys(cnt).forEach(function(k){if(cnt[k]>max){max=cnt[k];}});
+  // 최다 득표가 여러 개면 그 중에서 랜덤 선택 (편향 제거)
+  var tops=[];
+  Object.keys(cnt).forEach(function(k){if(cnt[k]===max){tops.push(k);}});
+  return tops[Math.floor(Math.random()*tops.length)];
 }
 
 function showLoading(){ show('s-loading'); setTimeout(function(){ var dna=tally(); renderResult(dna); sendToGAS(userName,userTeam,dna); },1400); }
