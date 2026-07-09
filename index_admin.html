@@ -547,20 +547,33 @@ function doChangePw() {
 // ════════════════════════════════════════
 // 데이터 로드
 // ════════════════════════════════════════
+function dedupeByName(data) {
+  // 같은 이름으로 여러 번 응답이 들어온 경우 timestamp가 가장 최신인 것만 남김
+  var latest = {};
+  data.forEach(function(r) {
+    if (!r || !r.name) return;
+    var prev = latest[r.name];
+    if (!prev || new Date(r.timestamp) > new Date(prev.timestamp)) {
+      latest[r.name] = r;
+    }
+  });
+  return Object.keys(latest).map(function(k) { return latest[k]; });
+}
+
 function loadData() {
   document.getElementById('upd-txt').textContent = '불러오는 중…';
   fetch(GAS_URL + '?action=getAll')
     .then(function(r){ return r.text(); })
     .then(function(txt) {
       var d = []; try { d = JSON.parse(txt); } catch(e) { d = []; }
-      allData = Array.isArray(d) ? d : [];
+      allData = dedupeByName(Array.isArray(d) ? d : []);
       renderAll();
       var n = new Date();
       document.getElementById('upd-txt').textContent =
         '업데이트 ' + n.getHours() + ':' + String(n.getMinutes()).padStart(2,'0');
     })
     .catch(function() {
-      allData = makeSample();
+      allData = dedupeByName(makeSample());
       document.getElementById('upd-txt').textContent = '(샘플 데이터)';
       renderAll();
     });
