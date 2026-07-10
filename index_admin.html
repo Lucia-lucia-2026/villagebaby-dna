@@ -97,6 +97,21 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t);m
 .btn-export:hover{border-color:var(--g);color:var(--g)}
 .btn-regroup{border:1px solid var(--g);background:var(--gl);color:var(--gd);border-radius:var(--rs);padding:.38rem .8rem;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
 .btn-regroup:hover{background:#BDDAF5}
+.btn-regroup.pulse{background:#FEF3E2;border-color:#EF9F27;color:#633806;animation:btnPulse 1.6s ease-in-out infinite}
+@keyframes btnPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,159,39,.4)}50%{box-shadow:0 0 0 6px rgba(239,159,39,0)}}
+.btn-undo{border:1px solid var(--bd);background:var(--w);color:var(--ts);border-radius:var(--rs);padding:.38rem .8rem;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:border-color .15s,color .15s;display:inline-flex;align-items:center;gap:5px}
+.btn-undo:hover:not(:disabled){border-color:var(--g);color:var(--g)}
+.btn-undo:disabled{opacity:.45;cursor:default}
+.btn-undo .undo-count{display:inline-block;background:var(--gl);color:var(--gd);font-size:10px;padding:1px 7px;border-radius:20px;font-weight:800;line-height:1.4}
+.btn-undo:disabled .undo-count{background:var(--bd);color:var(--tm)}
+
+.modal-warn .modal-title{color:#c47f11}
+.modal-warn .btn-confirm{width:100%;background:var(--g);color:#fff;border:none;border-radius:var(--rs);padding:.72rem;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:.75rem;transition:background .15s}
+.modal-warn .btn-confirm:hover{background:var(--gd)}
+.modal-warn .btn-cancel{width:100%;border:1px solid var(--bd);background:transparent;color:var(--ts);border-radius:var(--rs);padding:.65rem;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;margin-top:.5rem}
+.modal-warn .btn-cancel:hover{border-color:var(--g);color:var(--g)}
+.modal-warn .info-box{background:var(--gl);border:1px solid var(--gm);border-radius:var(--rs);padding:.7rem 1rem;font-size:12px;color:var(--gd);margin:.75rem 0 0;line-height:1.6}
+.modal-warn .info-box b{font-weight:800}
 .btn-del-all{border:1px solid #f5c2c2;background:#fff5f5;color:#c0392b;border-radius:var(--rs);padding:.38rem .8rem;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:background .15s}
 .btn-del-all:hover{background:#fce8e8;border-color:#e74c3c}
 .btn-del-row{width:22px;height:22px;border-radius:50%;border:1px solid var(--bd);background:transparent;color:var(--tm);font-size:13px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s,color .15s}
@@ -299,6 +314,21 @@ tr:hover td{background:var(--bg)}
   </div>
 </div>
 
+<!-- 재편성 확인 모달 -->
+<div class="modal-overlay" id="modal-regroup">
+  <div class="modal-card modal-warn">
+    <button class="modal-close" onclick="closeRegroupConfirm()">✕</button>
+    <div class="modal-title">🔄 다시 편성할까요?</div>
+    <div class="modal-sub">현재 <strong id="regroup-current-info">—</strong>이 새롭게 계산됩니다.</div>
+    <div class="info-box">
+      💡 걱정 마세요! 이전 편성은 자동 저장되어<br>
+      <b>↶ 되돌리기</b> 버튼으로 언제든 복원할 수 있습니다.
+    </div>
+    <button class="btn-confirm" onclick="confirmRegroup()">재편성하기</button>
+    <button class="btn-cancel" onclick="closeRegroupConfirm()">취소</button>
+  </div>
+</div>
+
 <!-- MAIN -->
 <div id="main">
   <!-- 통계 -->
@@ -329,6 +359,7 @@ tr:hover td{background:var(--bg)}
         </button>
       </div>
       <button class="btn-regroup" id="btn-regroup" onclick="doRegroup()">🔄 재편성</button>
+      <button class="btn-undo" id="btn-undo" onclick="undoRegroup()" disabled>↶ 되돌리기 <span class="undo-count" id="undo-count">0</span></button>
       <button class="btn-present" onclick="openPresent()">🖥️ 출력하기</button>
     </div>
     <button class="btn-export" onclick="exportCSV()">📥 CSV 내보내기</button>
@@ -404,6 +435,8 @@ var currentGroups = {};
 var selectedN     = 6;   // 조 수 (5 or 6)
 var autoTimer     = null;
 var delTarget     = {name:'', timestamp:''};
+var groupHistory  = [];  // 재편성 히스토리 (Undo 스택)
+var MAX_HISTORY   = 10;
 
 // ════════════════════════════════════════
 // 화면 전환
@@ -670,18 +703,97 @@ function makeSample() {
 // 조 수 변경 & 재편성
 // ════════════════════════════════════════
 function changeGroups(n) {
+  if (selectedN === n) return; // 같은 조 수면 무시
   selectedN = n;
   document.getElementById('btn-g5').style.background = (n === 5) ? 'var(--g)' : 'transparent';
   document.getElementById('btn-g5').style.color      = (n === 5) ? '#fff'     : 'var(--tm)';
   document.getElementById('btn-g6').style.background = (n === 6) ? 'var(--g)' : 'transparent';
   document.getElementById('btn-g6').style.color      = (n === 6) ? '#fff'     : 'var(--tm)';
-  doRegroup();
+  // 편성이 이미 있으면 즉시 재편성 (사용자가 명시적으로 조 수를 바꿨으므로 확인 생략, 히스토리는 저장)
+  // 편성이 없으면 조 수만 변경하고 대기
+  if (currentGroups && Object.keys(currentGroups).length > 0) {
+    executeRegroup();
+  }
 }
 
 function doRegroup() {
+  // 응답 자체가 없으면 아무 동작 안 함
+  if (allData.length === 0) {
+    alert('아직 응답이 없습니다.');
+    return;
+  }
+  // 첫 편성이면 확인 없이 바로 실행
+  if (!currentGroups || Object.keys(currentGroups).length === 0) {
+    executeRegroup();
+    return;
+  }
+  // 이미 편성된 상태 → 확인 모달
+  openRegroupConfirm();
+}
+
+// 실제 재편성 실행 (히스토리 저장 포함)
+function executeRegroup() {
+  // 기존 편성이 있으면 스냅샷을 히스토리에 저장
+  if (currentGroups && Object.keys(currentGroups).length > 0) {
+    pushHistory(currentGroups, selectedN);
+  }
   currentGroups = calcGroups(allData, selectedN);
   renderGroups(currentGroups);
   renderTable(allData, currentGroups);
+}
+
+// 히스토리 스택에 현재 편성 저장 (deep clone)
+function pushHistory(groups, n) {
+  var snapshot = {};
+  Object.keys(groups).forEach(function(g) {
+    snapshot[g] = groups[g].slice();
+  });
+  groupHistory.push({ groups: snapshot, n: n, savedAt: new Date() });
+  if (groupHistory.length > MAX_HISTORY) groupHistory.shift();
+  updateUndoButton();
+}
+
+// 되돌리기: 마지막 히스토리로 복원
+function undoRegroup() {
+  if (groupHistory.length === 0) return;
+  var prev = groupHistory.pop();
+  currentGroups = prev.groups;
+  selectedN = prev.n;
+  // 조 수 버튼 UI 동기화
+  document.getElementById('btn-g5').style.background = (selectedN === 5) ? 'var(--g)' : 'transparent';
+  document.getElementById('btn-g5').style.color      = (selectedN === 5) ? '#fff'     : 'var(--tm)';
+  document.getElementById('btn-g6').style.background = (selectedN === 6) ? 'var(--g)' : 'transparent';
+  document.getElementById('btn-g6').style.color      = (selectedN === 6) ? '#fff'     : 'var(--tm)';
+  // 최신 데이터에 맞춰 삭제된 사람은 제거
+  currentGroups = syncCurrentGroups(currentGroups, allData);
+  renderGroups(currentGroups);
+  renderTable(allData, currentGroups);
+  updateUndoButton();
+}
+
+function updateUndoButton() {
+  var btn = document.getElementById('btn-undo');
+  var cnt = document.getElementById('undo-count');
+  cnt.textContent = groupHistory.length;
+  btn.disabled = groupHistory.length === 0;
+  btn.title = groupHistory.length === 0
+    ? '되돌릴 편성이 없습니다'
+    : '이전 편성으로 되돌리기 (' + groupHistory.length + '단계 저장됨)';
+}
+
+// 재편성 확인 모달
+function openRegroupConfirm() {
+  var keys = Object.keys(currentGroups);
+  var info = keys.length + '조 · 총 ' + allData.length + '명 편성';
+  document.getElementById('regroup-current-info').textContent = info;
+  document.getElementById('modal-regroup').classList.add('on');
+}
+function closeRegroupConfirm() {
+  document.getElementById('modal-regroup').classList.remove('on');
+}
+function confirmRegroup() {
+  closeRegroupConfirm();
+  executeRegroup();
 }
 
 // ════════════════════════════════════════
@@ -813,25 +925,93 @@ function renderAll() {
     ov.appendChild(c);
   });
 
-  currentGroups = calcGroups(allData, selectedN);
+  // 조편성은 자동 실행하지 않음 — 재편성 버튼을 눌러야만 갱신됨
+  // 자동 새로고침 시엔 기존 편성 유지 (삭제된 사람만 조에서 제거)
+  currentGroups = syncCurrentGroups(currentGroups, allData);
   renderGroups(currentGroups);
   renderTable(allData, currentGroups);
+  updateUndoButton();
+}
+
+// ════════════════════════════════════════
+// 조편성 동기화 (재편성 없이 삭제된 사람만 제거)
+// ════════════════════════════════════════
+function syncCurrentGroups(groups, data) {
+  if (!groups || Object.keys(groups).length === 0) return {};
+  var nameSet = {};
+  data.forEach(function(r) { nameSet[r.name] = true; });
+  var synced = {};
+  Object.keys(groups).forEach(function(g) {
+    synced[g] = groups[g].filter(function(m) { return nameSet[m.name]; });
+  });
+  return synced;
+}
+
+// 미배정 인원(아직 조 편성 안 된 사람) 목록
+function getUnassignedMembers() {
+  var assigned = {};
+  Object.keys(currentGroups).forEach(function(g) {
+    currentGroups[g].forEach(function(m) { assigned[m.name] = true; });
+  });
+  return allData.filter(function(r) { return !assigned[r.name]; });
 }
 
 function renderGroups(groups) {
   var grid = document.getElementById('groups-grid');
+  var notice = document.getElementById('algo-notice');
+  var btnRegroup = document.getElementById('btn-regroup');
   grid.innerHTML = '';
   var keys = Object.keys(groups).sort(function(a,b){ return Number(a)-Number(b); });
 
-  if (keys.length === 0 || allData.length === 0) {
+  // 케이스 1: 응답 자체가 없음
+  if (allData.length === 0) {
     grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><span>⏳</span>아직 응답이 없습니다.</div>';
+    notice.innerHTML = '조편성 알고리즘: DNA 유형 다양성 우선 → 같은 팀 분산 → 크기 균등';
+    notice.style.background = '#FEF3E2';
+    notice.style.borderColor = '#FAC775';
+    notice.style.color = '#633806';
+    btnRegroup.classList.remove('pulse');
     return;
   }
 
+  // 케이스 2: 응답은 있지만 아직 조편성이 안 됨
+  if (keys.length === 0) {
+    grid.innerHTML =
+      '<div class="empty" style="grid-column:1/-1">'
+      + '<span>🎯</span>'
+      + '<div style="font-size:14px;color:var(--t);font-weight:700;margin-bottom:.4rem">아직 조편성이 되지 않았습니다</div>'
+      + '<div style="font-size:12px;color:var(--tm);line-height:1.6">현재 <b style="color:var(--gd)">'+allData.length+'명</b>이 응답했습니다.<br><b>🔄 재편성</b> 버튼을 눌러 조를 편성해주세요.</div>'
+      + '</div>';
+    notice.innerHTML = '💡 총 <b>'+allData.length+'명</b> 응답 · 조편성을 시작하려면 <b>🔄 재편성</b> 버튼을 눌러주세요.';
+    notice.style.background = '#FEF3E2';
+    notice.style.borderColor = '#FAC775';
+    notice.style.color = '#633806';
+    btnRegroup.classList.add('pulse');
+    return;
+  }
+
+  // 케이스 3: 편성 완료 (미배정 인원 안내 포함)
+  var unassigned = getUnassignedMembers();
+  var assignedTotal = allData.length - unassigned.length;
   var minSz = groups[keys[0]].length;
   var maxSz = groups[keys[keys.length-1]].length;
-  document.getElementById('algo-notice').textContent =
-    '총 '+allData.length+'명 → '+keys.length+'조 편성 ('+minSz+'~'+maxSz+'명) | DNA·팀 다양성 최적화';
+
+  if (unassigned.length > 0) {
+    notice.innerHTML =
+      '<b>✅ '+assignedTotal+'명 편성 완료</b> ('+keys.length+'조, '+minSz+'~'+maxSz+'명) · '
+      + '<b style="color:#c0392b">⚠️ 새 응답 '+unassigned.length+'명 미배정</b> · '
+      + '재편성 필요 시 <b>🔄 재편성</b> 버튼을 눌러주세요.';
+    notice.style.background = '#FEF3E2';
+    notice.style.borderColor = '#FAC775';
+    notice.style.color = '#633806';
+    btnRegroup.classList.add('pulse');
+  } else {
+    notice.innerHTML = '✅ 총 <b>'+allData.length+'명</b> → <b>'+keys.length+'조</b> 편성 완료 ('+minSz+'~'+maxSz+'명) · DNA·팀 다양성 최적화';
+    notice.style.background = 'var(--gl)';
+    notice.style.borderColor = 'var(--gm)';
+    notice.style.color = 'var(--gd)';
+    btnRegroup.classList.remove('pulse');
+  }
 
   keys.forEach(function(g) {
     var members = groups[g];
@@ -894,7 +1074,7 @@ function renderTable(data, groups) {
       +'<td style="font-size:12px;color:var(--ts)">'+tl+'</td>'
       +'<td><span class="tp" style="background:'+d.bg+';color:'+d.tc+'">'+d.emoji+' '+d.name+'</span></td>'
       +'<td style="font-size:11px;color:var(--tm)">'+d.value+'</td>'
-      +'<td class="tg">'+(lookup[r.name]||'—')+'조</td>'
+      +'<td class="tg">'+(lookup[r.name] ? lookup[r.name]+'조' : '<span style="color:#c0392b;font-weight:700;font-size:11px;background:#fff5f5;padding:2px 8px;border-radius:20px;border:1px solid #f5c2c2">미배정</span>')+'</td>'
       +'<td class="tt-col">'+fmtTime(r.timestamp)+'</td>'
       +'<td><button class="btn-del-row" onclick="openDelRow(\''+nm+'\',\''+ts+'\')" title="삭제">✕</button></td>'
     +'</tr>';
@@ -957,8 +1137,8 @@ function confirmDelAll() {
   btn.disabled = true; btn.textContent = '삭제 중…';
   fetch(GAS_URL + '?action=clear')
     .then(function(r){ return r.text(); })
-    .then(function() { allData = []; closeDelAll(); renderAll(); })
-    .catch(function()  { allData = []; closeDelAll(); renderAll(); });
+    .then(function() { allData = []; currentGroups = {}; groupHistory = []; updateUndoButton(); closeDelAll(); renderAll(); })
+    .catch(function()  { allData = []; currentGroups = {}; groupHistory = []; updateUndoButton(); closeDelAll(); renderAll(); });
 }
 
 // ════════════════════════════════════════
@@ -1043,10 +1223,13 @@ function closePresent() {
   document.body.style.overflow = '';
 }
 
-// ESC 키로 발표 모드 닫기
+// ESC 키로 발표 모드 / 재편성 확인 모달 닫기
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape' && document.getElementById('present-view').classList.contains('on')) {
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('present-view').classList.contains('on')) {
     closePresent();
+  } else if (document.getElementById('modal-regroup').classList.contains('on')) {
+    closeRegroupConfirm();
   }
 });
 </script>
