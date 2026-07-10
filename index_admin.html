@@ -133,6 +133,57 @@ tr:hover td{background:var(--bg)}
 .tt-col{color:var(--tm);white-space:nowrap;font-size:11px}
 .empty{text-align:center;padding:3rem 1rem;color:var(--tm);font-size:14px}
 .empty span{font-size:32px;display:block;margin-bottom:.75rem}
+
+/* ── 출력(발표) 모드 버튼 ── */
+.btn-present{border:1px solid var(--g);background:var(--w);color:var(--gd);border-radius:var(--rs);padding:.38rem .8rem;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.btn-present:hover{background:var(--gl)}
+
+/* ── 출력(발표) 모드 오버레이 ── */
+.present-view{position:fixed;inset:0;z-index:500;background:#F7FAF9;overflow:auto;display:none;flex-direction:column;animation:fadeIn .25s ease}
+.present-view.on{display:flex}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.present-hdr{display:flex;justify-content:space-between;align-items:flex-start;padding:2rem 2.5rem 1.5rem;background:linear-gradient(180deg,#fff 0%,#F7FAF9 100%);border-bottom:1px solid var(--bd);flex-shrink:0}
+.present-title-wrap{flex:1}
+.present-brand{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:var(--g);letter-spacing:.02em;margin-bottom:.4rem}
+.present-brand .dot{width:8px;height:8px;background:var(--g);border-radius:50%}
+.present-title{font-size:38px;font-weight:900;letter-spacing:-.6px;color:#1a1a1a;line-height:1.1}
+.present-sub{margin-top:.5rem;font-size:16px;color:var(--ts);font-weight:500}
+.present-sub b{color:var(--gd);font-weight:800}
+.present-ctrl{display:flex;gap:10px;flex-shrink:0;margin-left:1rem}
+.btn-close-present{background:#1a1a1a;color:#fff;border:none;border-radius:var(--rs);padding:.6rem 1.1rem;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.btn-close-present:hover{background:#333}
+.btn-close-present::before{content:'✕ ';font-weight:400}
+
+.present-body{padding:1.5rem 2.5rem 3rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:20px;flex:1}
+
+.pcard{background:var(--w);border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.06);overflow:hidden;border:1px solid var(--bd);display:flex;flex-direction:column;animation:cardIn .35s ease backwards}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.pcard-head{padding:1.4rem 1.75rem 1.2rem;background:linear-gradient(180deg,var(--gl) 0%,#fff 100%);border-bottom:1px solid var(--bd);position:relative}
+.pcard-num{display:inline-block;font-size:11px;font-weight:800;color:var(--g);background:#fff;padding:3px 10px;border-radius:20px;letter-spacing:.05em}
+.pcard-name{font-size:34px;font-weight:900;margin-top:6px;color:#1a1a1a;letter-spacing:-.5px;line-height:1}
+.pcard-meta{font-size:14px;color:var(--ts);margin-top:6px;font-weight:500}
+.pcard-diversity{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.pdiv-badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700}
+
+.pcard-body{padding:.5rem 1.75rem 1.5rem;flex:1}
+.pmem{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #f0f0f0}
+.pmem:last-child{border-bottom:none}
+.pmem-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0}
+.pmem-name{flex:1;font-size:19px;font-weight:700;color:#1a1a1a;letter-spacing:-.2px}
+.pmem-team{font-size:13px;color:var(--tm);font-weight:500;padding:3px 10px;background:var(--bg);border-radius:20px;white-space:nowrap}
+.pmem-emoji{font-size:26px;line-height:1}
+
+.present-foot{padding:1rem 2.5rem 1.5rem;text-align:center;font-size:13px;color:var(--tm);border-top:1px solid var(--bd);background:#fff;flex-shrink:0}
+.present-foot kbd{background:#1a1a1a;color:#fff;font-family:inherit;font-size:11px;padding:2px 6px;border-radius:4px;margin:0 3px}
+
+/* 카드 진입 애니메이션 딜레이 */
+.pcard:nth-child(1){animation-delay:0s}
+.pcard:nth-child(2){animation-delay:.05s}
+.pcard:nth-child(3){animation-delay:.1s}
+.pcard:nth-child(4){animation-delay:.15s}
+.pcard:nth-child(5){animation-delay:.2s}
+.pcard:nth-child(6){animation-delay:.25s}
 </style>
 </head>
 <body>
@@ -278,6 +329,7 @@ tr:hover td{background:var(--bg)}
         </button>
       </div>
       <button class="btn-regroup" id="btn-regroup" onclick="doRegroup()">🔄 재편성</button>
+      <button class="btn-present" onclick="openPresent()">🖥️ 출력하기</button>
     </div>
     <button class="btn-export" onclick="exportCSV()">📥 CSV 내보내기</button>
   </div>
@@ -305,6 +357,24 @@ tr:hover td{background:var(--bg)}
     </table>
   </div>
   <div style="height:2rem"></div>
+</div>
+
+<!-- 출력(발표) 모드 오버레이 -->
+<div class="present-view" id="present-view">
+  <div class="present-hdr">
+    <div class="present-title-wrap">
+      <div class="present-brand"><span class="dot"></span>빌리지베이비 · 타운홀 2026</div>
+      <div class="present-title">🧬 나의 빌베 DNA · 조편성 결과</div>
+      <div class="present-sub" id="present-sub">Core Value 속 나를 가장 닮은 DNA로 편성된 오늘의 조입니다.</div>
+    </div>
+    <div class="present-ctrl">
+      <button class="btn-close-present" onclick="closePresent()">닫기</button>
+    </div>
+  </div>
+  <div class="present-body" id="present-body"></div>
+  <div class="present-foot">
+    <kbd>ESC</kbd> 키로 닫을 수 있어요 · 프로젝터/큰 화면 발표용 모드
+  </div>
 </div>
 
 <script>
@@ -914,6 +984,71 @@ function exportCSV() {
   a.href = url; a.download = 'vb-dna-groups-'+new Date().toISOString().slice(0,10)+'.csv';
   a.click(); URL.revokeObjectURL(url);
 }
+
+// ════════════════════════════════════════
+// 출력(발표) 모드
+// ════════════════════════════════════════
+function openPresent() {
+  var keys = Object.keys(currentGroups).sort(function(a,b){ return Number(a)-Number(b); });
+  if (keys.length === 0 || allData.length === 0) {
+    alert('편성된 조가 없습니다. 응답 데이터를 먼저 확인해주세요.');
+    return;
+  }
+
+  // 헤더 서브 텍스트 업데이트
+  document.getElementById('present-sub').innerHTML =
+    '총 <b>'+allData.length+'명</b> · <b>'+keys.length+'조</b> 편성 완료 · DNA·팀 다양성 최적화';
+
+  var body = document.getElementById('present-body');
+  body.innerHTML = keys.map(function(g) {
+    var members = currentGroups[g];
+    var uDNA = {}, uTeam = {};
+    members.forEach(function(m){ uDNA[m.dna]=1; uTeam[m.team]=1; });
+    var cntDNA = Object.keys(uDNA).length;
+    var cntTeam = Object.keys(uTeam).length;
+    var dOK = cntDNA >= Math.min(5, members.length);
+    var tOK = cntTeam >= Math.min(5, members.length);
+
+    var memHTML = members.map(function(m) {
+      var d = DNA[m.dna] || {emoji:'?', bg:'#eee', tc:'#333'};
+      var tl = TEAM_LABEL[m.team] || m.team || '—';
+      return '<div class="pmem">'
+        + '<div class="pmem-av" style="background:'+d.bg+';color:'+d.tc+'">'+m.name.slice(0,1)+'</div>'
+        + '<span class="pmem-name">'+m.name+'</span>'
+        + '<span class="pmem-team">'+tl+'</span>'
+        + '<span class="pmem-emoji">'+d.emoji+'</span>'
+        + '</div>';
+    }).join('');
+
+    return '<div class="pcard">'
+      + '<div class="pcard-head">'
+        + '<div class="pcard-num">GROUP '+g+'</div>'
+        + '<div class="pcard-name">'+g+'조</div>'
+        + '<div class="pcard-meta">'+members.length+'명</div>'
+        + '<div class="pcard-diversity">'
+          + '<span class="pdiv-badge" style="background:'+(dOK?'var(--gl)':'#FEF3E2')+';color:'+(dOK?'var(--gd)':'#633806')+'">DNA '+cntDNA+'/5</span>'
+          + '<span class="pdiv-badge" style="background:'+(tOK?'var(--gl)':'#FEF3E2')+';color:'+(tOK?'var(--gd)':'#633806')+'">팀 '+cntTeam+'/'+Math.min(5,members.length)+'</span>'
+        + '</div>'
+      + '</div>'
+      + '<div class="pcard-body">'+memHTML+'</div>'
+      + '</div>';
+  }).join('');
+
+  document.getElementById('present-view').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePresent() {
+  document.getElementById('present-view').classList.remove('on');
+  document.body.style.overflow = '';
+}
+
+// ESC 키로 발표 모드 닫기
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.getElementById('present-view').classList.contains('on')) {
+    closePresent();
+  }
+});
 </script>
 </body>
 </html>
